@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GlucoPredict AI - Patient Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f4f3f1",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#494640",
+                        "tertiary": "#715744",
+                        "surface": "#faf9f6",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#cbc6bd",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#e7e2d9",
+                        "secondary": "#615e57",
+                        "on-primary-container": "#fcfcff",
+                        "on-tertiary-fixed-variant": "#5a4230",
+                        "surface-variant": "#e3e2e0",
+                        "surface-tint": "#376282",
+                        "inverse-on-surface": "#f2f1ee",
+                        "tertiary-fixed-dim": "#e2c0a9",
+                        "surface-dim": "#dbdad7",
+                        "on-primary-fixed-variant": "#1c4b69",
+                        "surface-container-high": "#e9e8e5",
+                        "tertiary-container": "#8b6f5b",
+                        "on-surface": "#1a1c1a",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#a1cbef",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#a1cbef",
+                        "on-tertiary-fixed": "#2a1709",
+                        "background": "#faf9f6",
+                        "on-tertiary-container": "#fffbff",
+                        "on-surface-variant": "#42474d",
+                        "on-error": "#ffffff",
+                        "primary": "#35607f",
+                        "outline-variant": "#c2c7ce",
+                        "on-secondary-container": "#67645d",
+                        "surface-container": "#efeeeb",
+                        "primary-fixed": "#cae6ff",
+                        "primary-container": "#4f7999",
+                        "on-background": "#1a1c1a",
+                        "on-primary-fixed": "#001e30",
+                        "tertiary-fixed": "#ffdcc4",
+                        "surface-bright": "#faf9f6",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#e7e2d9",
+                        "on-secondary-fixed": "#1d1b16",
+                        "surface-container-highest": "#e3e2e0",
+                        "outline": "#72787e",
+                        "inverse-surface": "#2f312f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "card-gap": "24px",
+                        "base": "8px",
+                        "section-margin": "40px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #faf9f6;
+            color: #1a1c1a;
+            font-family: 'Inter', sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px rgba(93, 135, 168, 0.04);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 bg-surface-container-low border-r border-surface-container shadow-none p-base gap-4 z-50">
+<div class="px-4 py-6">
+<h1 class="font-headline-md text-headline-md text-on-surface font-bold">Clinical Portal</h1>
+<p class="text-label-md font-label-md text-secondary uppercase tracking-wider">Endocrinology Dept</p>
+</div>
+<nav class="flex-grow space-y-1 px-2">
+<!-- Active Navigation -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="font-body-md text-body-md">Predictor</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Records</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-body-md text-body-md">Management</span>
+</a>
+</nav>
+<div class="mt-auto px-4 py-4 space-y-2">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-xl font-body-md text-body-md flex items-center justify-center gap-2 transition-opacity active:opacity-80">
+<span class="material-symbols-outlined">add</span>
+                New Prediction
+            </button>
+<div class="pt-4 border-t border-surface-variant flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-secondary-container/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-secondary-container/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-grow md:ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar (Shared Component) -->
+<header class="sticky top-0 z-40 bg-surface flex justify-between items-center w-full px-container-padding py-4 shadow-sm">
+<div class="flex items-center gap-4">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">GlucoPredict AI</span>
+<nav class="hidden lg:flex items-center gap-6 ml-8">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">History</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-md focus:ring-2 focus:ring-primary w-64" placeholder="Search patient data..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="Provider Profile" class="w-10 h-10 rounded-full border-2 border-surface-container" data-alt="A professional headshot of a female endocrinologist in a clinical setting. She is wearing a white medical coat and has a friendly, professional expression. The background is a brightly lit, clean medical office with soft, warm white lighting that reflects the minimalist healthcare design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtpW_CITUTW34lU_erwh7TWOEjQQ6awfZOuTCf9vb2wSWzHslaT-7EyZ7Sl9eeDgO54zSFtE23kdkj-3BEAsybTCMMGkvDu5C839sGFWH-srg-nfHYHQcVYUIM9yIdmjfqwjiu-gytM_A5Ffe8XiPCbq0pEZDTc4i4_nviJDdH-GC_ZTPvJD7ZPmQDB7EqP8V7kkA_XsqmQFfqDegF_y1e50LRAvjlrBPQk1E1ZGCkBzZbNcGoJkkHpTKcDT2W9M8GI0gWgVh83g"/>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-container-padding max-w-[1600px] mx-auto w-full space-y-card-gap">
+<!-- Greeting & Header Action -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface">Good morning, Sarah</h2>
+<p class="text-on-surface-variant text-body-lg font-body-lg mt-1">Your latest assessment shows a consistent risk profile over the last 7 days.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container border border-secondary-container text-primary px-6 py-3 rounded-2xl font-body-md text-body-md flex items-center gap-2 hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined">download</span>
+                        Download Health Report
+                    </button>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-2xl font-body-md text-body-md flex items-center gap-2 active:opacity-80 transition-all">
+<span class="material-symbols-outlined">edit_note</span>
+                        Log Daily Vitals
+                    </button>
+</div>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-card-gap">
+<!-- Main Risk Assessment Card -->
+<article class="md:col-span-4 bg-surface-container-low rounded-2xl p-6 card-shadow flex flex-col justify-between">
+<div>
+<h3 class="text-label-md font-label-md text-secondary uppercase tracking-wider mb-4">Current Risk Level</h3>
+<div class="flex items-center justify-center py-8">
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- Simple CSS Gauge Placeholder -->
+<svg class="w-full h-full -rotate-90">
+<circle class="text-secondary-container" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.9" stroke-dashoffset="486.5" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-headline-xl font-headline-xl text-on-surface">12%</span>
+<span class="text-body-md font-body-md text-primary font-semibold">Low Risk</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white/50 rounded-xl p-4 mt-4">
+<div class="flex items-center justify-between text-label-md font-label-md text-on-surface-variant">
+<span>Last assessment</span>
+<span>Today, 08:30 AM</span>
+</div>
+<div class="w-full bg-secondary-container h-1.5 rounded-full mt-2">
+<div class="bg-primary h-1.5 rounded-full w-[12%]"></div>
+</div>
+</div>
+</article>
+<!-- Health Journey Chart -->
+<article class="md:col-span-8 bg-surface-container-low rounded-2xl p-6 card-shadow">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-headline-md font-headline-md text-on-surface">Health Journey</h3>
+<div class="flex items-center gap-2 bg-secondary-container/30 p-1 rounded-lg">
+<button class="px-3 py-1 rounded-md text-label-md font-label-md bg-white text-primary shadow-sm">30 Days</button>
+<button class="px-3 py-1 rounded-md text-label-md font-label-md text-on-surface-variant">90 Days</button>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-2">
+<!-- Simulated Chart Bars -->
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[60%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[45%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[55%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[70%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary rounded-t-lg h-[50%] transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[65%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[40%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[55%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[60%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[50%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[45%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[75%] hover:bg-primary/40 transition-all"></div>
+</div>
+<div class="mt-4 flex justify-between text-label-md font-label-md text-outline">
+<span>Oct 01</span>
+<span>Oct 15</span>
+<span>Today</span>
+</div>
+</article>
+<!-- Biometric Snapshot Cards -->
+<div class="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-card-gap">
+<!-- Glucose Card -->
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-white/40">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary p-2 bg-primary-fixed rounded-xl">bloodtype</span>
+<span class="text-on-error-container bg-error-container px-2 py-1 rounded-lg text-label-md font-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                +2%
+                            </span>
+</div>
+<p class="text-secondary text-label-md font-label-md uppercase tracking-wider">Avg. Glucose</p>
+<h4 class="text-headline-lg font-headline-lg text-on-surface mt-1">98 <span class="text-body-md font-body-md text-outline">mg/dL</span></h4>
+</div>
+<!-- BMI Card -->
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-white/40">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-tertiary p-2 bg-tertiary-fixed rounded-xl">monitor_weight</span>
+<span class="text-primary bg-primary-fixed px-2 py-1 rounded-lg text-label-md font-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+                                -1.5%
+                            </span>
+</div>
+<p class="text-secondary text-label-md font-label-md uppercase tracking-wider">Body Mass Index</p>
+<h4 class="text-headline-lg font-headline-lg text-on-surface mt-1">24.2 <span class="text-body-md font-body-md text-outline">Normal</span></h4>
+</div>
+<!-- Blood Pressure Card -->
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-white/40">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-on-secondary-fixed-variant p-2 bg-secondary-container rounded-xl">favorite</span>
+<span class="text-on-secondary-container bg-secondary-container px-2 py-1 rounded-lg text-label-md font-label-md">Steady</span>
+</div>
+<p class="text-secondary text-label-md font-label-md uppercase tracking-wider">Blood Pressure</p>
+<h4 class="text-headline-lg font-headline-lg text-on-surface mt-1">118/75 <span class="text-body-md font-body-md text-outline">mmHg</span></h4>
+</div>
+<!-- Personalized AI Insights Section -->
+<div class="bg-primary p-6 rounded-2xl card-shadow relative overflow-hidden flex flex-col justify-center">
+<div class="relative z-10">
+<h4 class="text-on-primary font-headline-md text-headline-md mb-2">AI Insights</h4>
+<p class="text-primary-fixed text-body-md font-body-md">Increasing daily steps by 2,000 could lower your risk by 5% next month.</p>
+<button class="mt-4 text-on-primary flex items-center gap-1 text-label-md font-label-md hover:underline">
+                                Explore recommendations
+                                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<!-- Background decoration -->
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-[80px]">auto_awesome</span>
+</div>
+</div>
+</div>
+<!-- Recent Activity/Journal -->
+<article class="md:col-span-12 bg-surface-container-low rounded-2xl card-shadow overflow-hidden">
+<div class="p-6 border-b border-surface-container flex items-center justify-between">
+<h3 class="text-headline-md font-headline-md text-on-surface">Recent Logs</h3>
+<button class="text-primary font-label-md text-label-md hover:underline">View All Records</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-surface-container-high/50 text-secondary text-label-md font-label-md uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4 text-left font-semibold">Date &amp; Time</th>
+<th class="px-6 py-4 text-left font-semibold">Glucose (mg/dL)</th>
+<th class="px-6 py-4 text-left font-semibold">Carbs (g)</th>
+<th class="px-6 py-4 text-left font-semibold">Activity</th>
+<th class="px-6 py-4 text-left font-semibold">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 text-body-md font-data-tabular">Today, 08:30 AM</td>
+<td class="px-6 py-4 text-body-md font-data-tabular">98</td>
+<td class="px-6 py-4 text-body-md font-data-tabular">45g</td>
+<td class="px-6 py-4 text-body-md font-body-md">Walking (20 min)</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-md font-label-md bg-primary-fixed text-on-primary-fixed-variant">Optimal</span>
+</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 text-body-md font-data-tabular">Yesterday, 10:15 PM</td>
+<td class="px-6 py-4 text-body-md font-data-tabular">105</td>
+<td class="px-6 py-4 text-body-md font-data-tabular">12g</td>
+<td class="px-6 py-4 text-body-md font-body-md">Resting</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-md font-label-md bg-secondary-container text-on-secondary-container">Standard</span>
+</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 text-body-md font-data-tabular">Yesterday, 01:20 PM</td>
+<td class="px-6 py-4 text-body-md font-data-tabular">112</td>
+<td class="px-6 py-4 text-body-md font-data-tabular">60g</td>
+<td class="px-6 py-4 text-body-md font-body-md">Lunch</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-md font-label-md bg-secondary-container text-on-secondary-container">Standard</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</article>
+</div>
+</div>
+<!-- Footer / Mobile Nav Shim -->
+<footer class="mt-auto py-8 text-center text-on-surface-variant font-label-md text-label-md border-t border-surface-container-high mx-container-padding">
+<p>© 2024 GlucoPredict AI. All rights reserved. Professional Healthcare Monitoring.</p>
+</footer>
+</main>
+<!-- FAB (Contextual) -->
+<button class="fixed bottom-6 right-6 md:right-12 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-50">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

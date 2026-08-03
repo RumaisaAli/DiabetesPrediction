@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GlucoPredict AI - Analytics &amp; Model Evaluation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "background": "#faf9f6",
+                        "tertiary-container": "#8b6f5b",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1c1a",
+                        "surface-dim": "#dbdad7",
+                        "outline-variant": "#c2c7ce",
+                        "secondary-container": "#e7e2d9",
+                        "inverse-primary": "#a1cbef",
+                        "primary-fixed-dim": "#a1cbef",
+                        "secondary-fixed": "#e7e2d9",
+                        "on-secondary-fixed": "#1d1b16",
+                        "tertiary": "#715744",
+                        "surface-container-high": "#e9e8e5",
+                        "on-secondary-container": "#67645d",
+                        "error": "#ba1a1a",
+                        "primary": "#35607f",
+                        "primary-container": "#4f7999",
+                        "outline": "#72787e",
+                        "on-tertiary-fixed-variant": "#5a4230",
+                        "on-background": "#1a1c1a",
+                        "on-tertiary-fixed": "#2a1709",
+                        "surface-bright": "#faf9f6",
+                        "surface": "#faf9f6",
+                        "tertiary-fixed-dim": "#e2c0a9",
+                        "on-primary-container": "#fcfcff",
+                        "on-tertiary-container": "#fffbff",
+                        "secondary": "#615e57",
+                        "surface-container-low": "#f4f3f1",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#cbc6bd",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001e30",
+                        "surface-container": "#efeeeb",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#494640",
+                        "tertiary-fixed": "#ffdcc4",
+                        "primary-fixed": "#cae6ff",
+                        "surface-container-highest": "#e3e2e0",
+                        "inverse-surface": "#2f312f",
+                        "inverse-on-surface": "#f2f1ee",
+                        "surface-tint": "#376282",
+                        "on-primary-fixed-variant": "#1c4b69",
+                        "on-surface-variant": "#42474d",
+                        "surface-variant": "#e3e2e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "container-padding": "24px",
+                        "gutter": "24px",
+                        "card-gap": "24px",
+                        "section-margin": "40px"
+                    },
+                    "fontFamily": {
+                        "data-tabular": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #faf9f6; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-shadow { box-shadow: 0 4px 20px rgba(93, 135, 168, 0.04); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e3e2e0; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 h-screen w-64 bg-surface-container-low dark:bg-surface-container-highest hidden md:flex flex-col p-base gap-4 z-40">
+<div class="px-4 py-6">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Clinical Portal</h1>
+</div>
+<p class="text-secondary font-body-md text-body-md px-1 opacity-70">Endocrinology Dept</p>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-transform active:scale-95 rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span> Overview
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-transform active:scale-95 rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">medical_services</span> Predictor
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold font-body-md text-body-md transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined">analytics</span> Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-transform active:scale-95 rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">history</span> Records
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-transform active:scale-95 rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span> Management
+            </a>
+</nav>
+<div class="mt-auto px-4 py-6 border-t border-outline-variant/10">
+<button class="w-full bg-primary text-on-primary py-3 rounded-2xl font-bold font-body-md mb-6 hover:opacity-90 transition-opacity">
+                New Prediction
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-secondary-container/50 rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span> Support
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 text-error hover:bg-error-container/20 rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">logout</span> Logout
+                </a>
+</div>
+</div>
+</aside>
+<div class="flex-1 md:ml-64 flex flex-col">
+<!-- TopNavBar Component -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-container-padding py-4 bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-8">
+<span class="font-headline-lg text-headline-lg font-extrabold text-primary dark:text-inverse-primary tracking-tight">GlucoPredict AI</span>
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">History</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-primary w-64" placeholder="Search models..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden ml-2 border border-outline-variant">
+<img alt="Provider Profile" class="w-full h-full object-cover" data-alt="A professional medical provider headshot in a bright, modern clinic setting. The lighting is soft and high-key, emphasizing a clean and clinical yet warm environment. The individual is wearing professional attire, exuding confidence and care, aligned with a modern healthcare brand identity with muted blue and white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEQwDdTLHaZ2GWYaJIxUXflX8JUZ3KvjgiAszH5MUbN2usAdu9GlUMEdVKz19v6CwCKFOz1q0_V9QDoupT5RSVI-TRUxU3GFj1fyqv0k8LPDPWSMWJ6DvJA-t3umDndAkZAEIZYA45gYjH2SlVbJtbNOfvtwe57kdU7gl3yncKMQ3GEX6LoKhmIiw1WldjnTuW7Vl-4O-3-acCF90Tm1JIzqjYOYijJeh0GapTVwVlcqTpmY6FmMkLQmVzoTERmhozfqqH0JiZFA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="p-container-padding max-w-[1600px] w-full mx-auto space-y-gutter">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mb-1">Model Evaluation Panel</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Deep-dive performance analysis for Glucose Prediction Model v2.4.1</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-6 py-2.5 bg-surface-container-lowest border border-secondary-container text-primary rounded-2xl font-bold font-body-md card-shadow hover:bg-secondary-container/10 transition-colors">
+<span class="material-symbols-outlined text-base">download</span> Export Report
+                    </button>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-primary text-on-primary rounded-2xl font-bold font-body-md shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-base">refresh</span> Retrain Model
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Metrics Summary Bar Chart -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-2xl p-container-padding card-shadow">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-md text-headline-md text-on-surface">Model Performance Metrics</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-label-md font-label-md text-secondary">Current Model</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+<span class="text-label-md font-label-md text-secondary">Baseline (v2.3)</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-around gap-8 px-4">
+<!-- Accuracy -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="w-full flex justify-center items-end gap-2 h-full">
+<div class="w-12 bg-secondary-container rounded-t-lg h-[85%] transition-all"></div>
+<div class="w-12 bg-primary rounded-t-lg h-[92%] transition-all group-hover:opacity-80"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Accuracy</span>
+<span class="font-data-tabular text-data-tabular text-primary">92.4%</span>
+</div>
+<!-- Precision -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="w-full flex justify-center items-end gap-2 h-full">
+<div class="w-12 bg-secondary-container rounded-t-lg h-[78%] transition-all"></div>
+<div class="w-12 bg-primary rounded-t-lg h-[88%] transition-all group-hover:opacity-80"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Precision</span>
+<span class="font-data-tabular text-data-tabular text-primary">88.1%</span>
+</div>
+<!-- F1-Score -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="w-full flex justify-center items-end gap-2 h-full">
+<div class="w-12 bg-secondary-container rounded-t-lg h-[82%] transition-all"></div>
+<div class="w-12 bg-primary rounded-t-lg h-[90%] transition-all group-hover:opacity-80"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface">F1-Score</span>
+<span class="font-data-tabular text-data-tabular text-primary">90.5%</span>
+</div>
+<!-- Recall -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="w-full flex justify-center items-end gap-2 h-full">
+<div class="w-12 bg-secondary-container rounded-t-lg h-[80%] transition-all"></div>
+<div class="w-12 bg-primary rounded-t-lg h-[87%] transition-all group-hover:opacity-80"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Recall</span>
+<span class="font-data-tabular text-data-tabular text-primary">87.2%</span>
+</div>
+</div>
+</div>
+<!-- ROC-AUC Curve (Visual Representation) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-2xl p-container-padding card-shadow">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">ROC-AUC Curve</h3>
+<div class="relative h-64 w-full border-l-2 border-b-2 border-outline-variant mb-4">
+<!-- Chart Lines (Simulated SVG) -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M 0 100 Q 10 10, 100 0" fill="none" stroke="#35607f" stroke-dasharray="0" stroke-width="3"></path>
+<path d="M 0 100 L 100 0" fill="none" stroke="#c2c7ce" stroke-dasharray="4" stroke-width="1"></path>
+</svg>
+<div class="absolute bottom-4 right-4 bg-primary/10 px-3 py-1 rounded-lg">
+<span class="font-data-tabular text-data-tabular text-primary">AUC: 0.942</span>
+</div>
+</div>
+<div class="flex justify-between text-label-md font-label-md text-secondary">
+<span>False Positive Rate</span>
+<span>True Positive Rate</span>
+</div>
+</div>
+<!-- Confusion Matrix -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-2xl p-container-padding card-shadow">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface">Confusion Matrix</h3>
+<span class="material-symbols-outlined text-outline cursor-help">info</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-center">
+<div class="bg-primary text-on-primary p-6 rounded-xl flex flex-col justify-center gap-1">
+<span class="font-data-tabular text-headline-lg">1,242</span>
+<span class="text-label-md font-label-md opacity-80">True Negative</span>
+</div>
+<div class="bg-error-container text-on-error-container p-6 rounded-xl flex flex-col justify-center gap-1">
+<span class="font-data-tabular text-headline-lg">114</span>
+<span class="text-label-md font-label-md opacity-80">False Positive</span>
+</div>
+<div class="bg-tertiary-fixed text-on-tertiary-fixed p-6 rounded-xl flex flex-col justify-center gap-1">
+<span class="font-data-tabular text-headline-lg">86</span>
+<span class="text-label-md font-label-md opacity-80">False Negative</span>
+</div>
+<div class="bg-primary/80 text-on-primary p-6 rounded-xl flex flex-col justify-center gap-1">
+<span class="font-data-tabular text-headline-lg">842</span>
+<span class="text-label-md font-label-md opacity-80">True Positive</span>
+</div>
+</div>
+<div class="mt-4 flex justify-between px-2">
+<span class="text-label-md font-label-md text-secondary italic">Actual vs Predicted</span>
+</div>
+</div>
+<!-- Feature Importance Analysis -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-2xl p-container-padding card-shadow">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Feature Importance Analysis</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<span class="w-32 text-body-md font-body-md text-on-surface shrink-0">Blood Glucose</span>
+<div class="flex-1 h-8 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 94%"></div>
+</div>
+<span class="w-12 text-data-tabular text-data-tabular text-secondary">0.94</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-32 text-body-md font-body-md text-on-surface shrink-0">BMI Index</span>
+<div class="flex-1 h-8 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/80 rounded-full" style="width: 78%"></div>
+</div>
+<span class="w-12 text-data-tabular text-data-tabular text-secondary">0.78</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-32 text-body-md font-body-md text-on-surface shrink-0">Age Factors</span>
+<div class="flex-1 h-8 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/70 rounded-full" style="width: 62%"></div>
+</div>
+<span class="w-12 text-data-tabular text-data-tabular text-secondary">0.62</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-32 text-body-md font-body-md text-on-surface shrink-0">Insulin Levels</span>
+<div class="flex-1 h-8 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/60 rounded-full" style="width: 55%"></div>
+</div>
+<span class="w-12 text-data-tabular text-data-tabular text-secondary">0.55</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-32 text-body-md font-body-md text-on-surface shrink-0">Activity Log</span>
+<div class="flex-1 h-8 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/50 rounded-full" style="width: 34%"></div>
+</div>
+<span class="w-12 text-data-tabular text-data-tabular text-secondary">0.34</span>
+</div>
+</div>
+</div>
+<!-- Preprocessing Log & Dataset Stats -->
+<div class="col-span-12 bg-surface-container-lowest rounded-2xl card-shadow overflow-hidden">
+<div class="p-container-padding border-b border-surface-container-high flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Dataset Preprocessing Log</h3>
+<div class="flex items-center gap-4">
+<span class="text-body-md text-secondary">Total Samples: <span class="font-bold">24,502</span></span>
+<div class="h-4 w-px bg-outline-variant"></div>
+<span class="text-body-md text-secondary">Features: <span class="font-bold">18</span></span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase tracking-wider">Step</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase tracking-wider">Action Description</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase tracking-wider">Parameters</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase tracking-wider text-right">Execution Time</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface">1</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Missing Value Imputation</td>
+<td class="px-6 py-4 font-body-md text-body-md text-secondary">Mean Strategy</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 text-label-md font-label-md rounded-full">Success</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary text-right">0.42s</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface">2</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Outlier Detection (Z-Score)</td>
+<td class="px-6 py-4 font-body-md text-body-md text-secondary">Threshold: 3.0σ</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 text-label-md font-label-md rounded-full">Success</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary text-right">1.15s</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface">3</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Categorical Encoding</td>
+<td class="px-6 py-4 font-body-md text-body-md text-secondary">One-Hot Encoding</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-label-md font-label-md rounded-full">Warning</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary text-right">0.88s</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface">4</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Feature Scaling</td>
+<td class="px-6 py-4 font-body-md text-body-md text-secondary">Min-Max (0, 1)</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 text-label-md font-label-md rounded-full">Success</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary text-right">0.24s</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-surface-container-high flex justify-around py-3 px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-md">Overview</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="text-[10px] font-label-md">Predictor</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-[10px] font-label-md font-bold">Analytics</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-label-md">Records</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-label-md">Settings</span>
+</button>
+</nav>
+</body></html>

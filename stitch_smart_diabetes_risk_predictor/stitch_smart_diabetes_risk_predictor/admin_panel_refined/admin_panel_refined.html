@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GlucoPredict AI - Clinical Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#ffdad6",
+                    "background": "#faf9f6",
+                    "tertiary-container": "#8b6f5b",
+                    "on-error": "#ffffff",
+                    "on-surface": "#1a1c1a",
+                    "surface-dim": "#dbdad7",
+                    "outline-variant": "#c2c7ce",
+                    "secondary-container": "#e7e2d9",
+                    "inverse-primary": "#a1cbef",
+                    "primary-fixed-dim": "#a1cbef",
+                    "secondary-fixed": "#e7e2d9",
+                    "on-secondary-fixed": "#1d1b16",
+                    "tertiary": "#715744",
+                    "surface-container-high": "#e9e8e5",
+                    "on-secondary-container": "#67645d",
+                    "error": "#ba1a1a",
+                    "primary-container": "#4f7999",
+                    "outline": "#72787e",
+                    "on-tertiary-fixed-variant": "#5a4230",
+                    "on-background": "#1a1c1a",
+                    "on-tertiary-fixed": "#2a1709",
+                    "surface-bright": "#faf9f6",
+                    "surface": "#faf9f6",
+                    "tertiary-fixed-dim": "#e2c0a9",
+                    "on-primary-container": "#fcfcff",
+                    "on-tertiary-container": "#fffbff",
+                    "secondary": "#615e57",
+                    "surface-container-low": "#f4f3f1",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#cbc6bd",
+                    "primary": "#35607f",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001e30",
+                    "surface-container": "#efeeeb",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#494640",
+                    "tertiary-fixed": "#ffdcc4",
+                    "primary-fixed": "#cae6ff",
+                    "surface-container-highest": "#e3e2e0",
+                    "inverse-surface": "#2f312f",
+                    "inverse-on-surface": "#f2f1ee",
+                    "surface-tint": "#376282",
+                    "on-primary-fixed-variant": "#1c4b69",
+                    "on-surface-variant": "#42474d",
+                    "surface-variant": "#e3e2e0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "container-padding": "24px",
+                    "gutter": "20px",
+                    "card-gap": "24px",
+                    "section-margin": "40px"
+            },
+            "fontFamily": {
+                    "data-tabular": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-lg": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-shadow { box-shadow: 0 4px 20px rgba(93, 135, 168, 0.04); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 h-screen w-64 bg-surface-container-low dark:bg-surface-container-highest hidden md:flex flex-col p-base gap-4 border-r border-outline-variant/10">
+<div class="px-4 py-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">health_metrics</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface leading-tight">Clinical Portal</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Endocrinology Dept</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-colors font-body-md text-body-md rounded-2xl" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Overview
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-colors font-body-md text-body-md rounded-2xl" href="#">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+                    Predictor
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-colors font-body-md text-body-md rounded-2xl" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Analytics
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-colors font-body-md text-body-md rounded-2xl" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                    Records
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container font-bold font-body-md text-body-md active:scale-95 transition-transform rounded-2xl" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+                    Management
+                </a>
+</nav>
+</div>
+<div class="mt-auto px-4 pb-6 space-y-1">
+<button class="w-full mb-4 py-3 px-4 bg-primary text-on-primary font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity rounded-2xl">
+<span class="material-symbols-outlined">add</span>
+                New Prediction
+            </button>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-colors rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-secondary-container/50 transition-colors rounded-xl font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 min-h-screen">
+<!-- TopNavBar Component -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-container-padding py-4 bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-8">
+<span class="text-headline-lg font-headline-lg font-bold text-primary dark:text-inverse-primary">GlucoPredict AI</span>
+<nav class="hidden lg:flex items-center gap-6">
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="#">Analytics</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="#">History</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-primary w-64" placeholder="Search datasets..." type="text"/>
+</div>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<img alt="Provider Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-high" data-alt="A professional portrait of a senior endocrinologist in a clean, high-end medical clinic setting. The lighting is soft and natural, emphasizing a calm and authoritative healthcare environment. The doctor has a friendly yet focused expression, wearing a crisp white coat. The background is a blurred, modern hospital office with warm, muted tones consistent with a minimalist care aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPOSZmP62kv4CwSZ0EVZLIMyb-gBemL_iy-DRueBcsg1WnMCy6DSjemcnReDE1qJi46sieeF9YGtlUP5QBhTt90U_OqeURdUvy5qNVwhaE8zbuZRjbWMDfNoC7JCyw-GVmVSn1-yb_IvmdmZKsPnRLb0nEGOzh5KJjnH5aYdbtUgvUKqqGmm8I5EERF9N4R9I5yc24pJv-c6hweXM_9HYg96jGQW1p24lS6ocxahQXxLkOyedRLZdTavStnJdra-EVibSwWni6tA"/>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-container-padding max-w-[1600px] mx-auto space-y-section-margin">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface">Dataset &amp; Model Management</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Oversee training data pipelines and monitor predictive model performance.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 bg-secondary-container text-on-secondary-container rounded-xl font-bold flex items-center gap-2 hover:bg-secondary-container/80 transition-colors">
+<span class="material-symbols-outlined">download</span>
+                        Export Logs
+                    </button>
+<button class="px-6 py-2.5 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">upload</span>
+                        Upload Dataset
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-card-gap">
+<!-- System Monitoring Section (Analytics Cards) -->
+<div class="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-card-gap">
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-surface-container">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md">API RESPONSE TIME</span>
+<span class="material-symbols-outlined text-primary">speed</span>
+</div>
+<div class="flex items-baseline gap-2"><span class="font-headline-xl text-headline-xl text-on-surface">124ms</span><div class="flex items-center text-error font-data-tabular text-data-tabular"><span class="material-symbols-outlined text-[16px]">trending_up</span><span>12%</span></div></div>
+<div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-surface-container">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md">ACTIVE SESSIONS</span>
+<span class="material-symbols-outlined text-primary">group</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-on-surface">842</span>
+<span class="text-primary font-data-tabular text-data-tabular">Stable</span>
+</div>
+<div class="mt-4 flex gap-1 items-end h-8">
+<div class="flex-1 bg-primary/20 h-4 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-6 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-5 rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-8 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-6 rounded-t-sm"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-surface-container">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md">MODEL ACCURACY</span>
+<span class="material-symbols-outlined text-primary">verified</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-on-surface">98.4%</span>
+<span class="text-primary font-data-tabular text-data-tabular">Optimum</span>
+</div>
+<div class="mt-4 flex justify-between text-label-md text-on-surface-variant">
+<span>Last 24h</span>
+<span>Target: 97%</span>
+</div>
+</div>
+</div>
+<!-- Dataset Preview Table -->
+<div class="lg:col-span-8 bg-surface-container-low rounded-2xl card-shadow border border-surface-container overflow-hidden">
+<div class="p-6 border-b border-surface-container flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Available Datasets</h3>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container/30">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant">DATASET NAME</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant">RECORDS</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant">DATE UPLOADED</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant">FILE FORMAT</th><th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant">STATUS</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-tertiary-fixed/10 transition-colors group">
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface font-medium">patient_vitals_q3_2023.csv</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface-variant">1.2M</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Oct 12, 2023</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">.csv</td><td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-label-md font-bold">Processed</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-primary-container/20 text-primary rounded-lg">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors group">
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface font-medium">glucose_longitudinal_study.json</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface-variant">450k</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Nov 05, 2023</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">.json</td><td class="px-6 py-4">
+<span class="px-3 py-1 bg-tertiary-fixed/30 text-on-tertiary-fixed-variant rounded-full text-label-md font-bold">Validating</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-primary-container/20 text-primary rounded-lg">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-tertiary-fixed/10 transition-colors group">
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface font-medium">insulin_sensitivity_matrix.parquet</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface-variant">2.8M</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Nov 18, 2023</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">.parquet</td><td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-label-md font-bold">Processed</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-primary-container/20 text-primary rounded-lg">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Model Retraining Progress -->
+<div class="lg:col-span-4 flex flex-col gap-card-gap">
+<div class="bg-surface-container-low p-6 rounded-2xl card-shadow border border-surface-container flex-1">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface">Model Retraining</h3>
+<span class="px-3 py-1 bg-tertiary-fixed/30 text-on-tertiary-fixed-variant rounded-full text-label-md font-bold">In Progress</span>
+</div>
+<div class="space-y-6">
+<div><div class="flex justify-between mb-2">
+<span class="font-body-md text-body-md text-on-surface">Feature Engineering</span>
+<span class="font-data-tabular text-data-tabular text-primary font-bold">100%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden border border-outline-variant/10 shadow-inner">
+<div class="h-full bg-primary w-full shadow-[0_0_8px_rgba(53,96,127,0.4)]"></div>
+</div></div>
+<div><div class="flex justify-between mb-2">
+<span class="font-body-md text-body-md text-on-surface">Hyperparameter Tuning</span>
+<div class="flex flex-col items-end">
+<span class="font-data-tabular text-data-tabular text-primary font-bold">68%</span>
+<span class="text-[10px] text-on-surface-variant font-medium">ETA: 9m</span>
+</div>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden border border-outline-variant/10 shadow-inner">
+<div class="h-full bg-primary w-[68%] transition-all duration-500 shadow-[0_0_8px_rgba(53,96,127,0.4)]"></div>
+</div></div>
+<div class="p-4 bg-secondary-container/30 rounded-xl border border-secondary-container/20">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">info</span>
+<p class="font-body-md text-body-md text-on-secondary-container">
+                                        Estimated completion in <span class="font-bold">14 minutes</span>. System performance may be slightly impacted.
+                                    </p>
+</div>
+</div>
+<button class="w-full py-3 bg-error-container text-error rounded-xl font-bold hover:opacity-90 transition-opacity">
+                                Abort Retraining
+                            </button>
+</div>
+</div>
+<!-- Small Alert/Status Card -->
+<div class="bg-primary-container p-6 rounded-2xl card-shadow text-on-primary-container relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="font-headline-md text-headline-md mb-2">System Health</h4>
+<p class="font-body-md text-body-md opacity-90 mb-4">All prediction nodes are operational across 4 regions.</p>
+<div class="flex items-center gap-2 text-label-md font-bold">
+<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                                LIVE MONITORING
+                            </div>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-[120px] opacity-10">hub</span>
+</div>
+</div>
+</div>
+<!-- Detailed System Monitoring (Lower Section) -->
+<div class="bg-surface-container-low p-8 rounded-2xl card-shadow border border-surface-container">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">API Performance Metrics</h3>
+<div class="flex gap-4">
+<select class="bg-surface border-surface-container text-body-md rounded-lg focus:ring-primary">
+<option>Last 24 Hours</option>
+<option>Last 7 Days</option>
+</select>
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-gutter">
+<div class="space-y-2">
+<p class="font-label-md text-label-md text-on-surface-variant">PEAK LOAD</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">1,420 req/s</p>
+<div class="h-24 w-full flex items-end gap-1">
+<div class="flex-1 bg-primary/10 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[55%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[85%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[100%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[70%] rounded-t-sm"></div>
+</div>
+</div>
+<div class="space-y-2">
+<p class="font-label-md text-label-md text-on-surface-variant">ERROR RATE</p>
+<p class="font-headline-lg text-headline-lg text-error">0.02%</p>
+<div class="h-24 w-full flex items-end gap-1">
+<div class="flex-1 bg-error/10 h-[10%] rounded-t-sm"></div>
+<div class="flex-1 bg-error/10 h-[5%] rounded-t-sm"></div>
+<div class="flex-1 bg-error/10 h-[15%] rounded-t-sm"></div>
+<div class="flex-1 bg-error/10 h-[5%] rounded-t-sm"></div>
+<div class="flex-1 bg-error/10 h-[8%] rounded-t-sm"></div>
+<div class="flex-1 bg-error/10 h-[5%] rounded-t-sm"></div>
+</div>
+</div>
+<div class="space-y-2">
+<p class="font-label-md text-label-md text-on-surface-variant">P99 LATENCY</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">310ms</p>
+<div class="h-24 w-full flex items-end gap-1">
+<div class="flex-1 bg-primary/10 h-[30%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[35%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[50%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[45%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/10 h-[38%] rounded-t-sm"></div>
+</div>
+</div>
+<div class="space-y-2">
+<p class="font-label-md text-label-md text-on-surface-variant">UPTIME</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">99.998%</p>
+<div class="h-24 w-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[48px] text-primary/40">verified_user</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom NavBar (Shown only on small screens) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container-low p-4 flex justify-around items-center z-50 shadow-lg border-t border-outline-variant/10">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-bold">Overview</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+<span class="text-[10px] font-bold">Predict</span>
+</button>
+<button class="flex flex-col items-center gap-1 bg-secondary-container text-on-secondary-container px-4 py-1 rounded-xl">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="text-[10px] font-bold">Admin</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-[10px] font-bold">Data</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-[10px] font-bold">History</span>
+</button>
+</nav>
+</body></html>
