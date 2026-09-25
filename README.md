@@ -6,167 +6,332 @@
 
 ---
 
-## 1. Project Overview
-
-The **Intelligent Diabetes Risk Predictor** is a clinical decision-support web application designed to assess a patient's risk of diabetes based on diagnostic and lifestyle vitals (Age, BMI, Glucose, Blood Pressure, Insulin, Skin Thickness, Pregnancies, and Diabetes Pedigree Function). 
-
-Built to satisfy the rigorous functional requirements of the CS619 Design Document and Software Requirements Specification (SRS), the application provides:
-- **Patients:** Individual risk assessment, interactive circular risk gauge, personalized lifestyle recommendations, historical trend tracking, and downloadable PDF clinical reports.
-- **Healthcare Providers:** Clinical portal to submit vitals on behalf of patients and review longitudinal diagnostic records.
-- **Administrators:** Dataset management, one-click offline model retraining, automated model evaluation (Accuracy, F1, Precision, Recall, Confusion Matrix), active model promotion, and user feedback monitoring.
+> [!IMPORTANT]
+> ### Clinical Decision-Support & Medical Disclaimer
+> The **Intelligent Diabetes Risk Predictor** is developed strictly for **clinical decision-support and educational purposes**. The system estimates diabetes risk probabilities based on diagnostic and lifestyle vitals, but **it is NOT a substitute for professional medical diagnosis, clinical judgment, or laboratory-confirmed diagnostic testing**. Patients and healthcare providers must consult licensed medical professionals for definitive diagnoses, individualized treatment plans, or prescription adjustments.
 
 ---
 
-## 2. Technology Stack
+## 1. System Overview
 
-| Layer | Technology | Description |
+The **Intelligent Diabetes Risk Predictor** is a full-stack clinical decision-support web application that evaluates diabetes risk based on 8 diagnostic parameters from the Pima Indians Diabetes dataset:
+- Pregnancies
+- Glucose Concentration
+- Blood Pressure (Diastolic)
+- Skin Fold Thickness (Triceps)
+- 2-Hour Serum Insulin
+- Body Mass Index (BMI)
+- Diabetes Pedigree Function
+- Age
+
+Built strictly to satisfy the functional requirements of the CS619 Design Document and Software Requirements Specification (SRS), the platform provides dedicated role-based portals for **Patients**, **Healthcare Providers**, and **System Administrators**.
+
+---
+
+## 2. System Architecture
+
+The platform follows a modern, decoupled client-server architecture:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 Client Layer (Browser)                      │
+│   Vanilla HTML5 / Modern CSS3 / Vanilla ES6 JavaScript      │
+│   • Adapted Clinical Stitch UI    • Chart.js Trends         │
+│   • SVG Dynamic Risk Gauges       • Session & RBAC Guards   │
+└──────────────────────────────▲──────────────────────────────┘
+                               │ HTTP / JSON REST APIs
+┌──────────────────────────────▼──────────────────────────────┐
+│                 Backend Layer (FastAPI)                     │
+│   • Asynchronous REST API Engine   • JWT & Cookie Auth      │
+│   • Server Route & Role Guards     • ReportLab PDF Service  │
+└──────────────┬───────────────────────────────┬──────────────┘
+               │                               │
+┌──────────────▼──────────────┐ ┌──────────────▼──────────────┐
+│   Pure-Python ML Engine     │ │   Persistence (PostgreSQL)  │
+│   • StandardScaler (NumPy)  │ │   • SQLAlchemy 2.0 ORM      │
+│   • 4 Hand-Crafted Models   │ │   • Alembic Migrations      │
+│   • Zero Runtime Pickle     │ │   • Relational Integrity    │
+└─────────────────────────────┘ └─────────────────────────────┘
+```
+
+### Key Architectural Pillars:
+1. **Frontend:** Zero-framework Vanilla HTML5/CSS3/JavaScript ensuring high performance, zero build-step overhead, and full compliance with project constraints.
+2. **Backend:** Asynchronous FastAPI service leveraging Pydantic v2 schemas and OpenAPI specification.
+3. **Zero-Pickle Runtime ML:** High-security inference engine executing purely via mathematical NumPy routines in plain Python—completely eliminating arbitrary code execution risks from runtime pickle/joblib deserialization.
+4. **Relational Persistence:** PostgreSQL with strict SQLAlchemy 2.0 `Mapped` and `mapped_column` type annotations and versioned Alembic schema migrations.
+
+---
+
+## 3. Technology Stack
+
+| Component | Technology | Purpose |
 |---|---|---|
-| **Frontend** | Vanilla HTML5, CSS3, JavaScript | Modern clinical portal adapted from Google Stitch UI mockup (Inter typography, Material Symbols, SVG gauges, Chart.js trends). No React/Vue/Angular; no Bootstrap. |
-| **Backend** | FastAPI (Python 3.12) | Asynchronous RESTful API with automated OpenAPI / Swagger documentation (`/docs`). |
-| **Database** | PostgreSQL | Relational database (hard requirement). |
-| **ORM & Migrations**| SQLAlchemy 2.0 & Alembic | Strict SQLAlchemy 2.0 declarative syntax using `Mapped[...]` and `mapped_column(...)`, session-based CRUD, and Alembic migrations. |
-| **Inference Engine** | Pure Python & NumPy | **Zero runtime pickle or joblib dependencies.** All model weights and decision logic are exported directly into pure Python modules (`app/ml/models/`). |
-| **PDF Reporting** | ReportLab | Server-side vector PDF generation for clinical reports. |
-| **Containerization** | Docker & Docker Compose | Multi-container setup with PostgreSQL 16 and FastAPI ASGI service. |
+| **Backend Framework** | Python 3.12 / FastAPI | Asynchronous RESTful API engine with automatic OpenAPI documentation |
+| **ORM & Migrations** | SQLAlchemy 2.0 & Alembic | Strict declarative database models and schema revision control |
+| **Database** | PostgreSQL 15+ | Relational data persistence for users, health records, predictions, and models |
+| **ML Inference** | Pure Python & NumPy | In-memory mathematical evaluation of models without pickle or joblib |
+| **Frontend** | Vanilla HTML5, CSS3, JavaScript | Lightweight, dependency-free clinical user interface (Inter font, Material Symbols) |
+| **Visualizations** | Chart.js & Dynamic SVG | Interactive longitudinal health trends and animated risk gauges |
+| **Document Generation** | ReportLab | Server-side vector PDF generation for clinical assessment reports |
+| **Containerization** | Docker & Docker Compose | Multi-service orchestration (FastAPI + PostgreSQL) |
+| **Testing** | Pytest, AnyIO, Starlette TestClient | Automated test suite verifying all 20 SRS test cases and ML equivalence |
 
 ---
 
-## 3. Pure-Python Model Architecture (`.pkl` → `.py`)
+## 4. Machine-Learning Workflow & Supported Models
 
-A core architectural requirement of this system is that **no pickled binaries (`.pkl`, `joblib`) are loaded at runtime in FastAPI**.
+The predictive workflow runs entirely offline for training and exports deterministic, self-contained Python modules for runtime evaluation:
 
-Trained parameters are extracted offline via [`scripts/export_models_to_py.py`](scripts/export_models_to_py.py) and generated into standalone Python modules under `app/ml/models/` and `app/ml/scaler.py`:
+```
+[Training Data: diabetes.csv] 
+         │
+         ▼
+[Offline Training & Evaluation] ──► [scripts/export_models_to_py.py]
+                                                   │
+         ┌─────────────────────────────────────────┴─────────────────────────────────────────┐
+         ▼                                         ▼                                         ▼
+  app/ml/scaler.py                     app/ml/models/*.py                          app/models/ml_model.py
+  (StandardScaler)                     (Pure Python Inference)                     (DB Metrics & Status)
+```
 
-### A. Feature Preprocessor (1 Component)
-* **StandardScaler ([`app/ml/scaler.py`](app/ml/scaler.py)):**
-  * Extracts learned `mean_` and `scale_` arrays.
-  * Computes $z = \frac{x - \mu}{\sigma}$ in pure NumPy to normalize patient vitals before inference.
+### A. Preprocessing Pipeline
+- **StandardScaler ([`app/ml/scaler.py`](app/ml/scaler.py)):** Normalizes input vitals using precomputed mean ($\mu$) and standard deviation ($\sigma$) vectors:
+  $$z = \frac{x - \mu}{\sigma}$$
 
-### B. Machine Learning Classification Models (4 Core Models)
+### B. Supported Classification Models
+All 4 models are implemented as pure-Python forward passes under [`app/ml/models/`](app/ml/models/):
+
 1. **Logistic Regression ([`app/ml/models/logistic_regression.py`](app/ml/models/logistic_regression.py)):**
-   * Exports `coef_` and `intercept_`.
-   * Computes linear combination $z = w^T x + b$ followed by the sigmoid activation function: $\sigma(z) = \frac{1}{1 + e^{-z}}$.
+   - Computes log-odds linear dot product $z = w^T x + b$.
+   - Yields risk probability via sigmoid activation: $\sigma(z) = \frac{1}{1 + e^{-z}}$.
 2. **Support Vector Machine ([`app/ml/models/svm.py`](app/ml/models/svm.py)):**
-   * Exports `support_vectors_`, `dual_coef_`, `intercept_`, and Platt scaling calibration parameters (`probA_`, `probB_`).
-   * Implements the RBF kernel computation $K(x, x') = \exp(-\gamma \|x - x'\|^2)$ directly using NumPy and SciPy.
+   - Radial Basis Function (RBF) kernel evaluation: $K(x_i, x) = \exp(-\gamma \|x_i - x\|^2)$ against support vectors.
+   - Calibrated posterior probabilities computed via Platt scaling parameters ($A, B$).
 3. **Decision Tree ([`app/ml/models/decision_tree.py`](app/ml/models/decision_tree.py)):**
-   * Exports tree arrays (`feature`, `threshold`, `children_left`, `children_right`, `value`).
-   * Traverses tree nodes down to the leaf node without any scikit-learn runtime dependency.
-4. **Neural Network ([`app/ml/models/neural_network.py`](app/ml/models/neural_network.py)):**
-   * **Deliberate Engineering Note:** While §6 permitted a joblib exception for the Neural Network if impractical, we successfully extracted all weight matrices (`coefs_`) and bias vectors (`intercepts_`) into NumPy arrays. The forward pass is hand-implemented with ReLU activations on hidden layers and Sigmoid activation on the output layer. As a result, **all four models operate completely pickle-free at runtime!**
+   - Recursive binary decision path traversal using feature index and threshold arrays down to leaf probability distributions.
+4. **Neural Network / Multi-Layer Perceptron ([`app/ml/models/neural_network.py`](app/ml/models/neural_network.py)):**
+   - Multi-layer forward pass with hidden layer ReLU activations and output Sigmoid activation using extracted weight matrices and bias vectors.
 
-### Equivalence Verification
-Unit tests in [`tests/test_models_equivalence.py`](tests/test_models_equivalence.py) feed identical sample rows from `diabetes.csv` through both the original `.pkl` files and the exported `.py` modules, asserting that predictions and confidence scores match within numerical tolerances ($10^{-5}$).
-
----
-
-## 4. Default Credentials (Seeded)
-
-The database includes three pre-seeded accounts for each role:
-
-| Role | Username | Password | Purpose |
-|---|---|---|---|
-| **Administrator** | `admin` | `AdminPassword123!` | Access to Admin Panel (`/admin`), Model Retraining, Datasets |
-| **Healthcare Provider** | `dr_smith` | `ProviderPassword123!` | Submitting assessments on behalf of patients |
-| **Patient** | `sarah_jenkins` | `PatientPassword123!` | Patient self-assessment, history trend, PDF reports |
-
-*The login page (`/login`) also includes one-click demo pill buttons to instantly populate any of these credentials.*
+### C. Retraining & Auto-Promotion
+Administrators can initiate model retraining from the Admin Panel. The system evaluates all 4 algorithms against standard metrics (Accuracy, Precision, Recall, F1-Score, and Confusion Matrix), stores evaluation history, and automatically promotes the highest-accuracy model to **active** status.
 
 ---
 
-## 5. System Screens & URLs
+## 5. User Roles & Main Features
 
-When the application is running, navigate to:
+### User Roles
+- **Patient:** Self-service portal to submit vitals, view instantaneous risk results, analyze contributing risk factors, track health metrics over time, and download formal clinical reports.
+- **Healthcare Provider (Doctor):** Clinical workflow to input diagnostic records for patients and monitor patient risk progression.
+- **Administrator:** System-level oversight, including dataset CSV uploads, model retraining, active algorithm promotion, and user feedback review.
 
-- **Login Portal:** [http://127.0.0.1:8000/login](http://127.0.0.1:8000/login) (or root `/`)
-- **Health Vitals Assessment Form:** [http://127.0.0.1:8000/input](http://127.0.0.1:8000/input)
-- **Risk Dashboard & History:** [http://127.0.0.1:8000/dashboard](http://127.0.0.1:8000/dashboard)
-- **Administrator Panel:** [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
-- **Interactive Swagger Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+### Main Features
+- **Real-Time Risk Scoring:** Instant classification into Low, Moderate, or High Risk with an exact confidence percentage.
+- **Contributing Risk Factor Analysis:** Visual breakdown pinpointing specific vitals (e.g., elevated Glucose or BMI) driving the risk score.
+- **Personalized Clinical Recommendations:** Evidence-based lifestyle guidance spanning diet, physical exercise, and recommended clinical follow-ups.
+- **Longitudinal Trend Analytics:** Interactive Chart.js visualizations showing historic vitals and risk evolution across assessments.
+- **Downloadable Clinical PDF Reports:** Clean, printable medical summaries containing patient vitals, active model details, risk breakdown, and timestamp.
+- **Robust Security & Navigation Guards:** JWT session handling, anti-caching HTTP headers (`Cache-Control: no-store`), server-enforced route protection, and bfcache guards on logout.
 
 ---
 
-## 6. How to Run
+## 6. Project Structure
 
-### Option A: Local Execution (PostgreSQL + Python)
+```
+DiabetesPrediction/
+├── app/
+│   ├── api/                     # REST API route handlers
+│   │   ├── admin.py             # Model retraining, datasets, feedback
+│   │   ├── auth.py              # Login, registration, token verification
+│   │   ├── health_records.py    # Health input and patient vitals
+│   │   ├── predict.py           # ML inference endpoint
+│   │   └── reports.py           # Vector PDF report generation
+│   ├── ml/                      # Machine learning engine
+│   │   ├── models/              # Pure Python models (LR, SVM, DT, NN)
+│   │   ├── model_runner.py      # Dynamic active model loader & evaluator
+│   │   └── scaler.py            # Pure Python StandardScaler
+│   ├── models/                  # SQLAlchemy 2.0 ORM entities
+│   │   ├── user.py              # Users and roles
+│   │   ├── health_record.py     # Patient vitals records
+│   │   ├── prediction.py        # Prediction results and factors
+│   │   ├── ml_model.py          # Model performance and status metadata
+│   │   ├── dataset.py           # Uploaded training datasets
+│   │   └── feedback.py          # User feedback entries
+│   ├── static/                  # Vanilla frontend assets
+│   │   ├── login.html           # Authentication portal
+│   │   ├── input.html           # Clinical vitals input form
+│   │   ├── dashboard.html       # Patient results, gauge, trends, reports
+│   │   ├── admin.html           # Administrator panel & model controls
+│   │   ├── css/styles.css       # Core clinical design system
+│   │   └── js/                  # Vanilla ES6 JavaScript modules
+│   ├── config.py                # Environment settings & configuration
+│   ├── database.py              # SQLAlchemy engine & session factory
+│   ├── main.py                  # FastAPI application entrypoint
+│   └── security.py              # Password hashing & JWT token handling
+├── migrations/                  # Alembic database migrations
+├── scripts/
+│   ├── export_models_to_py.py   # Offline model parameter exporter
+│   └── init_db.py               # Database initialization & seed script
+├── tests/
+│   ├── conftest.py              # Test fixtures & test DB setup
+│   ├── test_all_20_cases.py     # Full SRS test suite (TC-01 to TC-20)
+│   └── test_models_equivalence.py # Model numerical parity verification
+├── .env.example                 # Example environment configuration
+├── docker-compose.yml           # Multi-container Docker orchestration
+├── Dockerfile                   # Application container definition
+├── docker-entrypoint.sh         # Container boot & migration script
+├── requirements.txt             # Python runtime dependencies
+└── README.md                    # Project documentation
+```
 
-1. **Activate Virtual Environment & Install Dependencies:**
+---
+
+## 7. Installation & Deployment Instructions
+
+### Prerequisites
+- Python 3.12+
+- PostgreSQL 15+ (running locally or via container)
+- Docker & Docker Compose (optional, for containerized run)
+
+---
+
+### Option A: Local Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/RumaisaAli/DiabetesPrediction.git
+   cd DiabetesPrediction
+   ```
+
+2. **Create and activate a virtual environment:**
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install --upgrade pip
    pip install -r requirements.txt
    ```
 
-2. **Configure Environment:**
-   Ensure `.env` contains your PostgreSQL credentials:
-   ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/diabetes_predictor
-   TEST_DATABASE_URL=postgresql://user:password@localhost:5432/diabetes_predictor_test
-   SECRET_KEY=your-secret-key
-   ACCESS_TOKEN_EXPIRE_MINUTES=1440
-   ACTIVE_MODEL=logistic_regression
+4. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
    ```
+   Edit `.env` to supply your local PostgreSQL database credentials and a strong random `SECRET_KEY`.
 
-3. **Run Database Migrations & Seed Data:**
+5. **Run database migrations and seed baseline data:**
    ```bash
    alembic upgrade head
    python scripts/init_db.py
    ```
 
-4. **Start Application Server:**
+6. **Start the application server:**
    ```bash
    uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
    ```
+   Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your web browser.
+
+---
 
 ### Option B: Docker Compose Deployment
 
-Run the complete multi-container setup (PostgreSQL 16 + FastAPI Web App):
+Run the complete multi-container stack with a single command:
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
-The entrypoint automatically waits for PostgreSQL health checks, runs Alembic migrations, seeds the initial models and demo accounts, and launches the web portal on port `8000`.
+
+The container entrypoint automatically:
+1. Waits for PostgreSQL to become healthy.
+2. Applies Alembic migrations (`alembic upgrade head`).
+3. Seeds baseline models and demo users (`scripts/init_db.py`).
+4. Starts Uvicorn on port `8000`.
+
+Access the application at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ---
 
-## 7. Verification: Design Document Test Cases (TC-01 through TC-20)
+## 8. Configuration & Security Considerations
 
-All 20 test cases specified in the Design Document and SRS have been implemented in [`tests/test_all_20_cases.py`](tests/test_all_20_cases.py) using `pytest` and `httpx.AsyncClient` / `TestClient`:
+> [!WARNING]
+> ### Security & Secret Management Notice
+> Demo accounts and default credentials listed below are provided strictly for local development, academic demonstration, and automated test execution. **Do NOT use demo credentials, sample database URLs, or default secret keys in a production environment.**
+>
+> In production environments:
+> - Generate a cryptographically secure random `SECRET_KEY` (e.g., `openssl rand -hex 32`).
+> - Store database credentials, JWT secrets, and sensitive tokens exclusively in securely managed environment variables.
+> - Enforce HTTPS/TLS encryption to protect credentials and medical vitals in transit.
 
-| Test ID | Test Description | Input Data | Expected Result | Status |
+### Local Demo Credentials (Seeded)
+
+| Role | Username / Email | Password | Access Privileges |
+|---|---|---|---|
+| **System Administrator** | `admin` / `admin@gluco.ai` | `AdminPassword123!` | Model Retraining, Dataset Management, Feedback, System URLs |
+| **Healthcare Provider** | `dr_smith` / `provider@gluco.ai` | `ProviderPassword123!` | Clinical Input for Patients, History Review |
+| **Patient** | `sarah_jenkins` / `patient@gluco.ai` | `PatientPassword123!` | Self-Assessment, Dashboard, Trend Tracking, PDF Download |
+
+*(The login page at `/login` includes 1-click demo buttons to automatically populate these credentials).*
+
+---
+
+## 9. API Reference & Interactive Documentation
+
+FastAPI automatically generates comprehensive interactive documentation:
+- **Swagger UI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **ReDoc:** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+### Primary REST Endpoints
+
+| Category | Method | Endpoint | Access Role | Description |
 |---|---|---|---|---|
-| **TC-01** | User Login with Valid Credentials | `admin` / `AdminPassword123!` | 200 OK, JWT bearer token, user payload | **PASS** |
-| **TC-02** | User Login with Invalid Password | `admin` / `WrongPassword999!` | 401 Unauthorized, "Invalid username or password" | **PASS** |
-| **TC-03** | Health Input: Complete Form Submission | 8 complete clinical vitals | 200 OK, record stored, prediction generated | **PASS** |
-| **TC-04** | Health Input: Missing Glucose Field | Missing `glucose` key | 422 Unprocessable Entity, field error | **PASS** |
-| **TC-05** | Prediction Output Format | Complete vitals | Risk level ("High" / "Low"), confidence %, top factors | **PASS** |
-| **TC-06** | Incomplete Clinical Data Prompt | Partial vitals dictionary | 422 Unprocessable Entity, prompt to complete | **PASS** |
-| **TC-07** | Admin: Valid CSV Dataset Import | Valid CSV upload (`pima_test.csv`) | 200 OK, dataset stored, row count calculated | **PASS** |
-| **TC-08** | Admin: Invalid Filetype Rejected | Non-CSV file (`dataset.txt`) | 400 Bad Request, "Only CSV files are supported" | **PASS** |
-| **TC-09** | Model Retraining Pipeline | Trigger `/api/admin/train` | Retrains all 4 models (NN, SVM, DT, LR), writes `.py` modules | **PASS** |
-| **TC-10** | Model Evaluation Metrics | Trigger training evaluation | Accuracy, Precision, Recall, F1, Confusion Matrix | **PASS** |
-| **TC-11** | Auto-Promote Best Accuracy Model | Multi-model evaluation | Model with highest accuracy set to `active` | **PASS** |
-| **TC-12** | Download PDF Clinical Report | Existing prediction ID | 200 OK, `application/pdf`, valid PDF header (`%PDF-`) | **PASS** |
-| **TC-13** | Top Contributing Risk Factors | Existing prediction | Ranked factors with feature, impact, and clinical status | **PASS** |
-| **TC-14** | High-Risk Lifestyle Advice | High-risk input (Glucose 180, BMI 35) | Tailored diet, physical exercise, doctor-visit advice | **PASS** |
-| **TC-15** | Longitudinal Health History Trend | Multiple vitals across time | Chronological records returned for trend graphing | **PASS** |
-| **TC-16** | Dashboard Summary Data | Authenticated user | Aggregated metrics, active model, recent records | **PASS** |
-| **TC-17** | Admin Model Panel Visibility | Admin user access | All 4 models with version, metrics, active status | **PASS** |
-| **TC-18** | User Feedback Workflow | Patient feedback submission | Stored in PostgreSQL, visible in Admin feedback feed | **PASS** |
-| **TC-19** | Concurrency & Performance SLA | 10 concurrent `/api/predict` requests | All 10 complete under 3 seconds (**Actual: 0.225s**) | **PASS** |
-| **TC-20** | Role-Based Access Control (RBAC) | Patient accessing `/api/admin/*` | 403 Forbidden, redirected to login | **PASS** |
-
-### Running the Test Suite:
-```bash
-PYTHONPATH=. pytest -v
-```
-**Total Results:** `25 passed in 8.98s` (20 SRS test cases + 5 model equivalence tests).
+| **Auth** | `POST` | `/api/auth/login` | Public | Authenticates credentials and returns JWT bearer token / session cookie |
+| **Auth** | `POST` | `/api/auth/register` | Public | Registers a new patient user account |
+| **Auth** | `GET` | `/api/auth/me` | Authenticated | Retrieves profile information for current session |
+| **Prediction** | `POST` | `/api/predict` | Authenticated | Evaluates 8 patient vitals against active ML model and returns risk |
+| **Records** | `POST` | `/api/health-records` | Authenticated | Persists clinical vitals record and triggers assessment |
+| **Records** | `GET` | `/api/health-records/patient/{id}` | Authenticated | Retrieves longitudinal vitals history for trend analysis |
+| **Reports** | `GET` | `/api/reports/download/{id}` | Authenticated | Generates and downloads formal ReportLab vector PDF report |
+| **Models** | `GET` | `/api/active-model` | Public | Returns current active model metadata and accuracy |
+| **Admin** | `GET` | `/api/admin/models` | Admin Only | Lists all trained models, versions, metrics, and active states |
+| **Admin** | `POST` | `/api/admin/models/{id}/activate` | Admin Only | Promotes a specific model to active production status |
+| **Admin** | `POST` | `/api/admin/train` | Admin Only | Triggers offline retraining of all 4 models and auto-promotes best |
+| **Admin** | `POST` | `/api/admin/datasets` | Admin Only | Uploads and registers new training dataset CSV |
+| **Feedback** | `POST` | `/api/feedback` | Authenticated | Submits patient feedback on assessment accuracy |
 
 ---
 
-## 8. Offline Model Retraining & Parameter Export
+## 10. Automated Testing & Verification
 
-To re-run the parameter export pipeline manually after training models offline in Jupyter:
+The project includes an end-to-end automated test suite verifying compliance with the CS619 Design Document, SRS requirements, and model mathematical equivalence:
+
+### Test Suite Execution
 ```bash
-python scripts/export_models_to_py.py
+PYTHONPATH=. pytest tests/ -v
 ```
-This reads the original `.pkl` files and updates the corresponding `.py` modules in `app/ml/models/`.
+
+### Coverage Overview:
+- **SRS Functional Test Cases (TC-01 through TC-20):**
+  - `TC-01`: Valid authentication and token issuance.
+  - `TC-02`: Rejection of invalid passwords with 401 Unauthorized.
+  - `TC-03`: Health data complete submission and record persistence.
+  - `TC-04`: Missing required vitals validation (422 Unprocessable Entity).
+  - `TC-05`: Risk prediction output format (Risk Level, Confidence %, Factors).
+  - `TC-06`: Incomplete clinical input handling.
+  - `TC-07`: Valid CSV dataset import and row indexing.
+  - `TC-08`: Non-CSV dataset upload rejection.
+  - `TC-09`: Automated model training across all 4 algorithms.
+  - `TC-10`: Comprehensive evaluation metrics calculation.
+  - `TC-11`: Automatic promotion of highest-accuracy model.
+  - `TC-12`: ReportLab vector PDF generation and HTTP response headers.
+  - `TC-13`: Ranked risk factor breakdown generation.
+  - `TC-14`: High-risk lifestyle recommendations.
+  - `TC-15`: Longitudinal history retrieval for trend charting.
+  - `TC-16`: Patient dashboard summary aggregation.
+  - `TC-17`: Admin model management panel visibility.
+  - `TC-18`: User feedback recording and administration view.
+  - `TC-19`: High-concurrency performance SLA (10 requests under 3 seconds).
+  - `TC-20`: Role-Based Access Control security enforcement.
+- **Model Equivalence Tests (`tests/test_models_equivalence.py`):**
+  - Confirms zero-divergence ($\le 10^{-5}$) between exported pure-Python modules and original scikit-learn models across test samples.
+
+**Result:** `25 passed in ~12 seconds` (100% test pass rate).
