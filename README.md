@@ -102,7 +102,7 @@ When the application is running, navigate to:
    ```env
    DATABASE_URL=postgresql://user:password@localhost:5432/diabetes_predictor
    TEST_DATABASE_URL=postgresql://user:password@localhost:5432/diabetes_predictor_test
-   SECRET_KEY=cs619-super-secret-jwt-key-2026-s26projecta7ffd
+   SECRET_KEY=your-secret-key
    ACCESS_TOKEN_EXPIRE_MINUTES=1440
    ACTIVE_MODEL=logistic_regression
    ```
