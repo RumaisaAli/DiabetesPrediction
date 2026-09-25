@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Patient Dashboard - Intelligent Diabetes Risk Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <script>
+        // Guard: Logged-out users cannot access system pages
+        try {
+            const token = localStorage.getItem("gluco_jwt_token");
+            const userStr = localStorage.getItem("gluco_user_profile");
+            if (!token || !userStr) {
+                window.location.replace("/login?msg=Please log in to access this page.");
+            }
+        } catch (e) {
+            window.location.replace("/login?msg=Please log in to access this page.");
+        }
+    </script>
+    <!-- Chart.js for Factors & Trend Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <span class="material-symbols-outlined">health_metrics</span>
+            </div>
+            <div>
+                <h1 class="brand-title">GlucoPredict AI</h1>
+                <p class="brand-subtitle">Clinical Portal</p>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="/dashboard" class="nav-item active">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/input" class="nav-item">
+                <span class="material-symbols-outlined">medical_services</span>
+                <span>Risk Predictor</span>
+            </a>
+            <a href="/admin" id="nav-admin-link" class="nav-item">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>Management</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item" onclick="UI.openSupportModal(); return false;">
+                <span class="material-symbols-outlined">help</span>
+                <span>Support & Info</span>
+            </a>
+            <a href="#" class="nav-item" onclick="Auth.logout(); return false;" style="color: var(--error);">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+        <!-- Top App Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="page-title-display" class="page-title">Patient Health Dashboard</h2>
+            </div>
+            <div class="topbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-badge">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">person</span>
+                    <span id="current-user-name" style="font-size: 13px; font-weight: 600;">Loading...</span>
+                    <span id="current-user-role" class="role-pill">...</span>
+                </div>
+                <button onclick="Auth.logout()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 12px; color: var(--error); border-color: var(--error-container);" title="Sign out of clinical session">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-body">
+            <!-- Greeting & Actions Banner -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h2 id="patient-greeting" style="font-size: 26px; font-weight: 700; color: var(--text-main);">Good day</h2>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">Review your clinical risk profile, contributing biometric factors, and tailored health journey.</p>
+                    <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); background: var(--surface-low); padding: 4px 12px; border-radius: var(--radius-full); border: 1px solid var(--border);">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">neurology</span>
+                        <span>Active System Model: <strong id="active-system-model-name" style="color: var(--primary);">Loading...</strong></span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button id="feedback-modal-btn" class="btn btn-secondary">
+                        <span class="material-symbols-outlined">feedback</span> Submit Feedback
+                    </button>
+                    <button id="download-pdf-btn" class="btn btn-outline">
+                        <span class="material-symbols-outlined">download</span> Download Report (PDF)
+                    </button>
+                    <a href="/input" class="btn btn-primary">
+                        <span class="material-symbols-outlined">add</span> New Assessment
+                    </a>
+                </div>
+            </div>
+
+            <!-- Empty State (No records yet) -->
+            <div id="empty-state" class="card" style="display: none; text-align: center; padding: 60px 20px;">
+                <div class="brand-icon" style="margin: 0 auto 20px; width: 64px; height: 64px;">
+                    <span class="material-symbols-outlined" style="font-size: 36px;">monitoring</span>
+                </div>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text-main);">No Health Assessments Recorded Yet</h3>
+                <p style="font-size: 14px; color: var(--text-muted); max-width: 480px; margin: 8px auto 24px;">
+                    Submit your clinical vitals (glucose, blood pressure, BMI, etc.) to compute your diabetes risk level and personalized recommendations.
+                </p>
+                <a href="/input" class="btn btn-primary" style="padding: 12px 28px;">
+                    <span class="material-symbols-outlined">edit_note</span> Start First Assessment
+                </a>
+            </div>
+
+            <!-- Dashboard Content Bento Grid -->
+            <div id="dashboard-content" style="display: none;">
+                <div class="grid-12">
+                    <!-- Card 1: Risk Assessment & Gauge -->
+                    <div class="col-span-4 card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Current Assessment</span>
+                                <span id="risk-level-badge" class="badge">--</span>
+                            </div>
+
+                            <!-- Circular SVG Gauge -->
+                            <div class="gauge-container">
+                                <svg class="gauge-svg" viewBox="0 0 200 200">
+                                    <circle class="gauge-circle-bg" cx="100" cy="100" r="88"/>
+                                    <circle id="gauge-fill-circle" class="gauge-circle-fill" cx="100" cy="100" r="88" stroke-dasharray="552.9" stroke-dashoffset="552.9"/>
+                                </svg>
+                                <div class="gauge-text">
+                                    <div id="risk-confidence-val" class="gauge-value">--%</div>
+                                    <div class="gauge-label" style="color: var(--text-muted);">Confidence Score</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;">
+                            <div>Model: <b id="model-used-display" style="color: var(--text-main);">--</b></div>
+                            <div id="assessment-time-display">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Top Contributing Risk Factors Breakdown -->
+                    <div class="col-span-8 card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">Top Contributing Risk Factors</h3>
+                            <span style="font-size: 12px; color: var(--text-muted);">Relative Clinical Impact (%)</span>
+                        </div>
+                        <div style="height: 240px; position: relative;">
+                            <canvas id="factorsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Actionable Clinical Recommendations -->
+                    <div class="col-span-6 card">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                            <span class="material-symbols-outlined" style="color: var(--primary);">health_and_safety</span>
+                            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">Personalized Recommendations</h3>
+                        </div>
+                        <ul id="recommendations-list" class="recommendation-list">
+                            <!-- Populated dynamically -->
+                        </ul>
+                    </div>
+
+                    <!-- Card 4: Historical Health Journey Trend Chart (TC-15, TC-16) -->
+                    <div class="col-span-6 card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">Biometric Trend Over Time</h3>
+                            <span style="font-size: 12px; color: var(--text-muted);">Glucose & BMI History</span>
+                        </div>
+                        <div style="height: 240px; position: relative;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Chronological Health Assessments Table -->
+                    <div class="col-span-12 card" style="padding: 0; overflow: hidden;">
+                        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">Assessment History Log</h3>
+                            <span style="font-size: 12px; color: var(--text-muted);">All historical evaluations stored in PostgreSQL</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Risk Level</th>
+                                        <th>Confidence</th>
+                                        <th>Glucose</th>
+                                        <th>BMI</th>
+                                        <th>Model Used</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedback-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+    <div class="card" style="width: 100%; max-width: 500px; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--primary);">Submit Patient Feedback</h3>
+            <button id="close-feedback-btn" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="feedback-status" class="alert alert-info" style="display: none; margin-bottom: 16px;"></div>
+        <form id="feedback-form">
+            <div class="form-group">
+                <label class="form-label" for="feedback-text">Your Clinical Feedback / Suggestion</label>
+                <textarea class="form-control" id="feedback-text" rows="4" placeholder="Describe your experience, report symptoms, or submit clinical observations..." required></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('feedback-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Send Feedback</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Intelligent Diabetes Risk Predictor - Authentication Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <script>
+        (function() {
+            // Check if user is arriving from a logout or session termination
+            const urlParams = new URLSearchParams(window.location.search);
+            const msg = (urlParams.get("msg") || "").toLowerCase();
+            const isLoggingOut = msg.includes("logged out") || msg.includes("logout") || msg.includes("expired") || msg.includes("denied") || msg.includes("log in");
+
+            if (isLoggingOut) {
+                // Forcibly clear all client credentials and cookie state
+                try {
+                    localStorage.removeItem("gluco_jwt_token");
+                    localStorage.removeItem("gluco_user_profile");
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    document.cookie = "access_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                } catch (e) {}
+                return; // Stop here! Render login form.
+            }
+
+            // Only redirect if genuinely authenticated and NOT logging out
+            try {
+                const token = localStorage.getItem("gluco_jwt_token");
+                const userStr = localStorage.getItem("gluco_user_profile");
+                if (token && userStr && token !== "null" && token !== "undefined") {
+                    const user = JSON.parse(userStr);
+                    if (user && user.role === "admin") {
+                        window.location.replace("/admin");
+                    } else if (user) {
+                        window.location.replace("/dashboard");
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <!-- Brand Header -->
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="brand-icon" style="margin: 0 auto 12px; width: 50px; height: 50px;">
+                <span class="material-symbols-outlined" style="font-size: 28px;">medical_services</span>
+            </div>
+            <h1 style="font-size: 22px; font-weight: 700; color: var(--primary);">Intelligent Diabetes Predictor</h1>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Clinical Decision Support & Risk Assessment</p>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <div id="auth-alert" class="alert alert-error" style="display: none;"></div>
+
+        <!-- Tab Toggle (Login vs Register) -->
+        <div class="role-selector">
+            <button id="tab-login" class="role-btn active" type="button">Log In</button>
+            <button id="tab-register" class="role-btn" type="button">Register New Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label" for="login-username">Username or Email</label>
+                <input class="form-control" id="login-username" type="text" placeholder="e.g. sarah_jenkins or admin" required autocomplete="username"/>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="form-label" for="login-password" style="margin-bottom: 0;">Password</label>
+                    <a href="#" id="forgot-password-link" style="font-size: 12px;">Forgot password?</a>
+                </div>
+                <input class="form-control" id="login-password" type="password" placeholder="••••••••" required autocomplete="current-password"/>
+            </div>
+
+            <button id="login-submit-btn" class="btn btn-primary btn-block" type="submit" style="padding: 12px; margin-top: 10px;">
+                <span class="material-symbols-outlined">login</span> Log In
+            </button>
+        </form>
+
+        <!-- Registration Form (Hidden by default) -->
+        <form id="register-form" style="display: none;">
+            <div class="form-group">
+                <label class="form-label" for="reg-username">Desired Username</label>
+                <input class="form-control" id="reg-username" type="text" placeholder="e.g. john_doe" minlength="3" required/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="reg-email">Email Address</label>
+                <input class="form-control" id="reg-email" type="email" placeholder="john@example.com" required/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="reg-role">Account Role</label>
+                <select class="form-control" id="reg-role">
+                    <option value="patient">Patient (Personal Health Tracking)</option>
+                    <option value="provider">Healthcare Provider (Clinical Assessment)</option>
+                    <option value="admin">Administrator (Model Management)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="reg-password">Password</label>
+                <input class="form-control" id="reg-password" type="password" placeholder="At least 6 characters" minlength="6" required/>
+            </div>
+
+            <button id="register-submit-btn" class="btn btn-primary btn-block" type="submit" style="padding: 12px; margin-top: 10px;">
+                <span class="material-symbols-outlined">person_add</span> Create Account
+            </button>
+        </form>
+
+        <!-- Quick Demo Switcher (For Evaluation and Quick Testing) -->
+        <div class="demo-accounts">
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                Quick Demo Accounts (1-Click Fill)
+            </span>
+            <div class="demo-pills">
+                <button type="button" class="demo-pill" onclick="fillDemo('patient')">👤 Patient (Sarah)</button>
+                <button type="button" class="demo-pill" onclick="fillDemo('provider')">🩺 Doctor (Smith)</button>
+                <button type="button" class="demo-pill" onclick="fillDemo('admin')">⚙️ Admin</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px; font-size: 12px; color: var(--text-muted);">
+            CS619 Final-Year Project • Group ID S26PROJECTA7FFD
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/auth.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Display error message from query params if redirected
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get("msg");
+        const alertEl = document.getElementById("auth-alert");
+        if (msg) {
+            alertEl.textContent = msg;
+            alertEl.style.display = "flex";
+        }
+
+        const tabLogin = document.getElementById("tab-login");
+        const tabRegister = document.getElementById("tab-register");
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+
+        tabLogin.onclick = () => {
+            tabLogin.classList.add("active");
+            tabRegister.classList.remove("active");
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
+            alertEl.style.display = "none";
+        };
+
+        tabRegister.onclick = () => {
+            tabRegister.classList.add("active");
+            tabLogin.classList.remove("active");
+            loginForm.style.display = "none";
+            registerForm.style.display = "block";
+            alertEl.style.display = "none";
+        };
+
+        // Login Handler
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            alertEl.style.display = "none";
+            const btn = document.getElementById("login-submit-btn");
+            btn.disabled = true;
+            btn.textContent = "Verifying Credentials...";
+
+            const username = document.getElementById("login-username").value.trim();
+            const password = document.getElementById("login-password").value;
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alertEl.className = "alert alert-error";
+                    alertEl.textContent = data.detail || "Login failed. Please check credentials.";
+                    alertEl.style.display = "flex";
+                    btn.disabled = false;
+                    btn.innerHTML = `<span class="material-symbols-outlined">login</span> Log In`;
+                    return;
+                }
+
+                Auth.setToken(data.access_token);
+                Auth.setUser(data.user);
+
+                // Redirect based on role
+                if (data.user.role === "admin") {
+                    window.location.href = "/admin";
+                } else {
+                    window.location.href = "/dashboard";
+                }
+            } catch (err) {
+                alertEl.className = "alert alert-error";
+                alertEl.textContent = "Network error connecting to authentication server.";
+                alertEl.style.display = "flex";
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined">login</span> Log In`;
+            }
+        };
+
+        // Register Handler
+        registerForm.onsubmit = async (e) => {
+            e.preventDefault();
+            alertEl.style.display = "none";
+            const btn = document.getElementById("register-submit-btn");
+            btn.disabled = true;
+            btn.textContent = "Registering Account...";
+
+            const username = document.getElementById("reg-username").value.trim();
+            const email = document.getElementById("reg-email").value.trim();
+            const role = document.getElementById("reg-role").value;
+            const password = document.getElementById("reg-password").value;
+
+            try {
+                const res = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, email, role, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alertEl.className = "alert alert-error";
+                    alertEl.textContent = data.detail || "Registration failed.";
+                    alertEl.style.display = "flex";
+                    btn.disabled = false;
+                    btn.innerHTML = `<span class="material-symbols-outlined">person_add</span> Create Account`;
+                    return;
+                }
+
+                Auth.setToken(data.access_token);
+                Auth.setUser(data.user);
+
+                if (data.user.role === "admin") {
+                    window.location.href = "/admin";
+                } else {
+                    window.location.href = "/dashboard";
+                }
+            } catch (err) {
+                alertEl.className = "alert alert-error";
+                alertEl.textContent = "Network error registering account.";
+                alertEl.style.display = "flex";
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined">person_add</span> Create Account`;
+            }
+        };
+
+        document.getElementById("forgot-password-link").onclick = (e) => {
+            e.preventDefault();
+            UI.openForgotPasswordModal();
+        };
+    });
+
+    function fillDemo(role) {
+        document.getElementById("tab-login").click();
+        const u = document.getElementById("login-username");
+        const p = document.getElementById("login-password");
+        if (role === "admin") {
+            u.value = "admin";
+            p.value = "AdminPassword123!";
+        } else if (role === "provider") {
+            u.value = "dr_smith";
+            p.value = "ProviderPassword123!";
+        } else {
+            u.value = "sarah_jenkins";
+            p.value = "PatientPassword123!";
+        }
+    }
+</script>
+</body>
+</html>

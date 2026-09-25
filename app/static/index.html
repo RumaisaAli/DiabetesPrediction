@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Intelligent Diabetes Risk Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+    <div style="text-align: center;">
+        <div class="brand-icon" style="margin: 0 auto 16px; width: 56px; height: 56px;">
+            <span class="material-symbols-outlined" style="font-size: 32px;">health_metrics</span>
+        </div>
+        <h2 style="color: var(--primary); font-size: 20px;">Intelligent Diabetes Risk Predictor</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Routing to your clinical portal session...</p>
+    </div>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        const user = Auth.getUser();
+        const token = Auth.getToken();
+        if (token && user) {
+            if (user.role === "admin") {
+                window.location.href = "/admin";
+            } else {
+                window.location.href = "/dashboard";
+            }
+        } else {
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+</html>

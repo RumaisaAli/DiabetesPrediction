@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: diabetes_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: diabetes_predictor
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d diabetes_predictor"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: diabetes_web
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/diabetes_predictor
+      - SECRET_KEY=cs619-super-secret-jwt-key-2026-s26projecta7ffd
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
+      - ACTIVE_MODEL=logistic_regression
+    volumes:
+      - ./app/ml/models:/app/app/ml/models
+
+volumes:
+  pgdata:

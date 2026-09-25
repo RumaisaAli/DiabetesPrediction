@@ -1,0 +1,33 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Environment Variables (keep .env.example tracked)
+.env
+
+# Database data / local postgres
+pg_data/
+*.sqlite3
+
+# Uploads directory contents (preserve folder structure via .gitkeep)
+app/uploads/*
+!app/uploads/.gitkeep
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+*.swp

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Clinical Prediction Engine - Intelligent Diabetes Risk Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <script>
+        // Guard: Logged-out users cannot access system pages
+        try {
+            const token = localStorage.getItem("gluco_jwt_token");
+            const userStr = localStorage.getItem("gluco_user_profile");
+            if (!token || !userStr) {
+                window.location.replace("/login?msg=Please log in to access this page.");
+            }
+        } catch (e) {
+            window.location.replace("/login?msg=Please log in to access this page.");
+        }
+    </script>
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar Navigation (Adapted from Stitch Mockup) -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <span class="material-symbols-outlined">health_metrics</span>
+            </div>
+            <div>
+                <h1 class="brand-title">GlucoPredict AI</h1>
+                <p class="brand-subtitle">Clinical Portal</p>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="/dashboard" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/input" class="nav-item active">
+                <span class="material-symbols-outlined">medical_services</span>
+                <span>Risk Predictor</span>
+            </a>
+            <a href="/admin" id="nav-admin-link" class="nav-item">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>Management</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item" onclick="UI.openSupportModal(); return false;">
+                <span class="material-symbols-outlined">help</span>
+                <span>Support & Info</span>
+            </a>
+            <a href="#" class="nav-item" onclick="Auth.logout(); return false;" style="color: var(--error);">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+        <!-- Top App Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="page-title-display" class="page-title">Prediction Engine</h2>
+            </div>
+            <div class="topbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-badge">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">person</span>
+                    <span id="current-user-name" style="font-size: 13px; font-weight: 600;">Loading...</span>
+                    <span id="current-user-role" class="role-pill">...</span>
+                </div>
+                <button onclick="Auth.logout()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 12px; color: var(--error); border-color: var(--error-container);" title="Sign out of clinical session">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Form Content Body -->
+        <div class="content-body">
+            <div class="card" style="max-width: 960px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 20px; font-weight: 700; color: var(--primary);">Enter Patient Clinical Vitals</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                            Provide all 8 biometric indicators to compute risk level and top contributing factors.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="populateSample('low')">
+                            Fill Sample Low Risk
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="populateSample('high')">
+                            Fill Sample High Risk
+                        </button>
+                    </div>
+                </div>
+
+                <div id="active-model-callout" style="display: flex; align-items: center; justify-content: space-between; background: var(--surface-low); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 20px; font-size: 13px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">neurology</span>
+                        <span>Inference Engine: Assessment will be evaluated by active model <strong id="input-active-model-name" style="color: var(--primary);">Loading...</strong></span>
+                    </div>
+                    <span id="input-active-model-acc" style="font-size: 12px; color: var(--text-muted);"></span>
+                </div>
+
+                <div id="form-alert" class="alert alert-error" style="display: none;"></div>
+
+                <form id="health-data-form" novalidate>
+                    <div class="grid-2">
+                        <!-- 1. Glucose -->
+                        <div class="form-group">
+                            <label class="form-label" for="glucose">
+                                <span>Plasma Glucose Level <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">70 - 99 mg/dL</span>
+                            </label>
+                            <input class="form-control" id="glucose" type="number" step="any" placeholder="e.g. 110 (Required)" required/>
+                            <div id="glucose-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Fasting blood sugar</span>
+                                <span>Range: 40 - 400 mg/dL</span>
+                            </div>
+                        </div>
+
+                        <!-- 2. BMI -->
+                        <div class="form-group">
+                            <label class="form-label" for="bmi">
+                                <span>Body Mass Index (BMI) <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">18.5 - 24.9</span>
+                            </label>
+                            <input class="form-control" id="bmi" type="number" step="any" placeholder="e.g. 26.5 (Required)" required/>
+                            <div id="bmi-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Weight (kg) / Height (m)²</span>
+                                <span>Range: 10 - 70</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Blood Pressure -->
+                        <div class="form-group">
+                            <label class="form-label" for="blood_pressure">
+                                <span>Diastolic Blood Pressure <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">60 - 80 mm Hg</span>
+                            </label>
+                            <input class="form-control" id="blood_pressure" type="number" step="any" placeholder="e.g. 74 (Required)" required/>
+                            <div id="blood_pressure-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Diastolic arterial pressure</span>
+                                <span>Range: 40 - 220 mm Hg</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. Patient Age -->
+                        <div class="form-group">
+                            <label class="form-label" for="age">
+                                <span>Patient Age <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">Years</span>
+                            </label>
+                            <input class="form-control" id="age" type="number" step="any" placeholder="e.g. 35 (Required)" required/>
+                            <div id="age-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Age in completed years</span>
+                                <span>Range: 18 - 120</span>
+                            </div>
+                        </div>
+
+                        <!-- 5. Insulin -->
+                        <div class="form-group">
+                            <label class="form-label" for="insulin">
+                                <span>Serum Insulin <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">16 - 166 μU/mL</span>
+                            </label>
+                            <input class="form-control" id="insulin" type="number" step="any" placeholder="e.g. 85 (0 if unavailable)" required/>
+                            <div id="insulin-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>2-Hour post-glucose serum insulin</span>
+                                <span>Range: 0 - 900 μU/mL</span>
+                            </div>
+                        </div>
+
+                        <!-- 6. Skin Thickness -->
+                        <div class="form-group">
+                            <label class="form-label" for="skin_thickness">
+                                <span>Triceps Skin Fold <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">10 - 25 mm</span>
+                            </label>
+                            <input class="form-control" id="skin_thickness" type="number" step="any" placeholder="e.g. 23 (0 if unavailable)" required/>
+                            <div id="skin_thickness-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Skinfold caliper metric</span>
+                                <span>Range: 0 - 99 mm</span>
+                            </div>
+                        </div>
+
+                        <!-- 7. Pregnancies -->
+                        <div class="form-group">
+                            <label class="form-label" for="pregnancies">
+                                <span>Pregnancies <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">Total count</span>
+                            </label>
+                            <input class="form-control" id="pregnancies" type="number" step="1" placeholder="e.g. 1" required/>
+                            <div id="pregnancies-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Total number of pregnancies (0 for male)</span>
+                                <span>Range: 0 - 25</span>
+                            </div>
+                        </div>
+
+                        <!-- 8. Diabetes Pedigree Function -->
+                        <div class="form-group">
+                            <label class="form-label" for="diabetes_pedigree_function">
+                                <span>Diabetes Pedigree Function <span style="color: var(--error);">*</span></span>
+                                <span class="form-label-hint">0.05 - 0.50</span>
+                            </label>
+                            <input class="form-control" id="diabetes_pedigree_function" type="number" step="any" placeholder="e.g. 0.35" required/>
+                            <div id="diabetes_pedigree_function-error" class="invalid-feedback"></div>
+                            <div class="field-meta-row">
+                                <span>Genetic family history scoring</span>
+                                <span>Range: 0.01 - 3.5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                        <button type="reset" class="btn btn-secondary">
+                            Reset Fields
+                        </button>
+                        <button id="submit-btn" type="submit" class="btn btn-primary" style="min-width: 220px;">
+                            <span class="material-symbols-outlined">analytics</span> Run Risk Assessment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/predict.js"></script>
+<script>
+    function populateSample(type) {
+        if (type === "high") {
+            document.getElementById("glucose").value = 180;
+            document.getElementById("bmi").value = 35.5;
+            document.getElementById("blood_pressure").value = 88;
+            document.getElementById("age").value = 52;
+            document.getElementById("insulin").value = 190;
+            document.getElementById("skin_thickness").value = 32;
+            document.getElementById("pregnancies").value = 5;
+            document.getElementById("diabetes_pedigree_function").value = 0.75;
+        } else {
+            document.getElementById("glucose").value = 88;
+            document.getElementById("bmi").value = 22.4;
+            document.getElementById("blood_pressure").value = 68;
+            document.getElementById("age").value = 28;
+            document.getElementById("insulin").value = 75;
+            document.getElementById("skin_thickness").value = 20;
+            document.getElementById("pregnancies").value = 1;
+            document.getElementById("diabetes_pedigree_function").value = 0.25;
+        }
+        // clear errors
+        document.querySelectorAll(".is-invalid").forEach(el => el.classList.remove("is-invalid"));
+        document.querySelectorAll(".invalid-feedback").forEach(el => el.textContent = "");
+        document.getElementById("form-alert").style.display = "none";
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Operations & Model Management - GlucoPredict AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <script>
+        // Guard: Restrict admin portal to authenticated administrators only
+        try {
+            const token = localStorage.getItem("gluco_jwt_token");
+            const userStr = localStorage.getItem("gluco_user_profile");
+            if (!token || !userStr) {
+                window.location.replace("/login?msg=Please log in to access this page.");
+            } else {
+                const user = JSON.parse(userStr);
+                if (!user || user.role !== "admin") {
+                    window.location.replace("/login?msg=Access denied: Administrative privileges required.");
+                }
+            }
+        } catch (e) {
+            window.location.replace("/login?msg=Please log in to access this page.");
+        }
+    </script>
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <span class="material-symbols-outlined">health_metrics</span>
+            </div>
+            <div>
+                <h1 class="brand-title">GlucoPredict AI</h1>
+                <p class="brand-subtitle">Admin Operations</p>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="/dashboard" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/input" class="nav-item">
+                <span class="material-symbols-outlined">medical_services</span>
+                <span>Risk Predictor</span>
+            </a>
+            <a href="/admin" id="nav-admin-link" class="nav-item active">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>Management</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item" onclick="UI.openSupportModal(); return false;">
+                <span class="material-symbols-outlined">help</span>
+                <span>Support & Info</span>
+            </a>
+            <a href="#" class="nav-item" onclick="Auth.logout(); return false;" style="color: var(--error);">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+        <!-- Top App Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="page-title-display" class="page-title">Admin Operations & Model Management</h2>
+            </div>
+            <div class="topbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-badge">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">admin_panel_settings</span>
+                    <span id="current-user-name" style="font-size: 13px; font-weight: 600;">Admin</span>
+                    <span id="current-user-role" class="role-pill admin">ADMIN</span>
+                </div>
+                <button onclick="Auth.logout()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 12px; color: var(--error); border-color: var(--error-container);" title="Sign out of clinical session">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-body">
+            <!-- System Stats Grid -->
+            <div class="grid-4" style="margin-bottom: 24px;">
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Active Runtime Model</span>
+                    <div id="stat-active-model" style="font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 6px;">Loading...</div>
+                    <span style="font-size: 11px; color: var(--success); font-weight: 600;">Pure-Python Imported Module</span>
+                </div>
+
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Total Predictions Logged</span>
+                    <div id="stat-predictions" style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-top: 6px;">--</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Stored in PostgreSQL</span>
+                </div>
+
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Registered Patients</span>
+                    <div id="stat-patients" style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-top: 6px;">--</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Role: Patient</span>
+                </div>
+
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Avg Prediction Latency</span>
+                    <div id="stat-latency" style="font-size: 24px; font-weight: 700; color: var(--success); margin-top: 6px;">--</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">&lt; 3000ms SLA Target</span>
+                </div>
+            </div>
+
+            <!-- Retraining Result Banner -->
+            <div id="retrain-result-box" class="alert alert-info" style="display: none; margin-bottom: 24px;"></div>
+
+            <!-- Model Evaluation Table Card (TC-17) -->
+            <div class="card" style="margin-bottom: 28px; padding: 0; overflow: hidden;">
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h3 style="font-size: 17px; font-weight: 700; color: var(--text-main);">Machine Learning Models Registry</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Evaluation metrics, test set accuracy, F1 score, and runtime activation status.</p>
+                    </div>
+                    <button id="retrain-all-btn" class="btn btn-primary">
+                        <span class="material-symbols-outlined">restart_alt</span> Retrain All Models
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Model Architecture</th>
+                                <th>Status</th>
+                                <th>Test Accuracy</th>
+                                <th>F1 Score</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>Last Trained</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="models-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 28px;">
+                <!-- Dataset Upload Card (TC-07, TC-08) -->
+                <div class="card">
+                    <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Upload Training Dataset</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                        Upload a new CSV dataset with the standard 8 clinical features and binary Outcome column.
+                    </p>
+
+                    <div id="upload-alert" class="alert alert-info" style="display: none;"></div>
+
+                    <div class="form-group">
+                        <input type="file" id="dataset-file-input" class="form-control" accept=".csv"/>
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">Supported format: CSV (.csv) only. Non-CSV files will be rejected.</small>
+                    </div>
+
+                    <button id="upload-dataset-btn" class="btn btn-secondary btn-block">
+                        <span class="material-symbols-outlined">upload_file</span> Upload Dataset
+                    </button>
+                </div>
+
+                <!-- Datasets History Table Card -->
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
+                        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">Available Datasets</h3>
+                    </div>
+                    <div class="table-responsive" style="max-height: 240px;">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Dataset Filename</th>
+                                    <th>Rows</th>
+                                    <th>Uploaded</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="datasets-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Feedback Review Panel (TC-18) -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
+                    <h3 style="font-size: 17px; font-weight: 700; color: var(--text-main);">User Feedback & Clinical Suggestions</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Observations and feedback submitted by patients and healthcare providers.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Submitted By</th>
+                                <th>Feedback Message</th>
+                                <th>Date Submitted</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/admin.js"></script>
+</body>
+</html>
