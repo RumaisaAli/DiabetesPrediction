@@ -3,6 +3,7 @@
 **Final-Year Software Engineering Project — CS619**  
 **Group ID:** `S26PROJECTA7FFD`  
 **Author:** Rumaisa Ali & Group  
+**Live At** https://intelligent-diabetes-predictor.vercel.app/
 
 ---
 
