@@ -34,6 +34,8 @@
                     const user = JSON.parse(userStr);
                     if (user && user.role === "admin") {
                         window.location.replace("/admin");
+                    } else if (user && user.role === "provider") {
+                        window.location.replace("/patients");
                     } else if (user) {
                         window.location.replace("/dashboard");
                     }
@@ -199,6 +201,8 @@
                 // Redirect based on role
                 if (data.user.role === "admin") {
                     window.location.href = "/admin";
+                } else if (data.user.role === "provider") {
+                    window.location.href = "/patients";
                 } else {
                     window.location.href = "/dashboard";
                 }
@@ -246,6 +250,8 @@
 
                 if (data.user.role === "admin") {
                     window.location.href = "/admin";
+                } else if (data.user.role === "provider") {
+                    window.location.href = "/patients";
                 } else {
                     window.location.href = "/dashboard";
                 }

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login Portal – Wireframe</title>
+<style>
+:root {
+    --primary: #35607f;
+    --primary-hover: #294b63;
+    --primary-light: #cae6ff;
+    --primary-container: #4f7999;
+    --on-primary: #ffffff;
+    --secondary: #615e57;
+    --secondary-container: #e7e2d9;
+    --background: #faf9f6;
+    --surface: #ffffff;
+    --surface-container: #efeeeb;
+    --surface-low: #f4f3f1;
+    --text-main: #1a1c1a;
+    --text-muted: #67645d;
+    --border: #e3e2e0;
+    --border-strong: #c2c7ce;
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+    --success: #1b5e20;
+    --success-container: #e8f5e9;
+    --warning: #b78103;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 20px rgba(53, 96, 127, 0.08);
+    --shadow-lg: 0 10px 30px rgba(53, 96, 127, 0.12);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background-color: var(--background); color: var(--text-main); line-height: 1.5; min-height: 100vh; }
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #f4f3f1 0%, #cae6ff 100%);
+}
+.auth-card {
+    background-color: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 480px;
+    padding: 40px;
+}
+.brand-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-container));
+    color: var(--on-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: var(--shadow-sm);
+    margin: 0 auto 12px;
+}
+.role-selector {
+    display: flex; gap: 8px; margin-bottom: 24px;
+    background-color: var(--surface-low); padding: 4px;
+    border-radius: var(--radius-md);
+}
+.role-btn {
+    flex: 1; padding: 8px; font-size: 12px; font-weight: 600;
+    text-align: center; background: transparent; border: none;
+    border-radius: var(--radius-sm); cursor: pointer;
+    color: var(--text-muted);
+}
+.role-btn.active {
+    background-color: var(--surface); color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+.form-group { margin-bottom: 20px; }
+.form-label {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; font-size: 13px; font-weight: 600;
+    color: var(--text-main); text-transform: uppercase; letter-spacing: 0.03em;
+}
+.form-control {
+    width: 100%; padding: 12px 16px; font-size: 14px;
+    border-radius: var(--radius-md); border: 1px solid var(--border-strong);
+    background-color: var(--surface); color: var(--text-main);
+    outline: none;
+}
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+    border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer;
+}
+.btn-primary { background-color: var(--primary); color: var(--on-primary); }
+.btn-block { width: 100%; }
+.demo-accounts {
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px dashed var(--border); text-align: center;
+}
+.demo-pills { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+.demo-pill {
+    padding: 4px 10px; font-size: 11px; font-weight: 600;
+    background-color: var(--surface-low); border: 1px solid var(--border);
+    border-radius: var(--radius-full); color: var(--text-muted);
+}
+a { color: var(--primary); text-decoration: none; font-size: 12px; }
+.medical-disclaimer {
+    margin-top: 24px; padding: 12px 16px;
+    background-color: var(--surface-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 11px; color: var(--text-muted); text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <!-- Brand Header -->
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="brand-icon">⚕</div>
+            <h1 style="font-size: 22px; font-weight: 700; color: var(--primary);">Intelligent Diabetes Predictor</h1>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Clinical Decision Support &amp; Risk Assessment</p>
+        </div>
+
+        <!-- Tab Toggle -->
+        <div class="role-selector">
+            <button class="role-btn active">Log In</button>
+            <button class="role-btn">Register New Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form>
+            <div class="form-group">
+                <label class="form-label">Username or Email</label>
+                <input class="form-control" type="text" placeholder="e.g. sarah_jenkins or admin"/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span>Password</span>
+                    <a href="#">Forgot password?</a>
+                </label>
+                <input class="form-control" type="password" placeholder="••••••••"/>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" style="margin-top: 8px;">
+                Sign In to Clinical Portal
+            </button>
+        </form>
+
+        <!-- Demo Accounts -->
+        <div class="demo-accounts">
+            <p style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Quick Demo Accounts</p>
+            <div class="demo-pills">
+                <span class="demo-pill">👤 Patient Demo</span>
+                <span class="demo-pill">🩺 Clinician Demo</span>
+                <span class="demo-pill">⚙ Admin Demo</span>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="medical-disclaimer">
+            🔒 Confidential Clinical Decision-Support System. Not a substitute for professional medical diagnosis.
+        </div>
+    </div>
+</div>
+</body>
+</html>

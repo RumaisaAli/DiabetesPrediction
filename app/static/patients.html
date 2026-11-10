@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Patient Records - Intelligent Diabetes Risk Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <script>
+        // Guard: Provider and Admin only
+        try {
+            const token = localStorage.getItem("gluco_jwt_token");
+            const userStr = localStorage.getItem("gluco_user_profile");
+            if (!token || !userStr) {
+                window.location.replace("/login?msg=Please log in to access this page.");
+            } else {
+                const user = JSON.parse(userStr);
+                if (!user || (user.role !== "provider" && user.role !== "admin")) {
+                    window.location.replace("/login?msg=Access denied: Provider or administrative privileges required.");
+                }
+            }
+        } catch (e) {
+            window.location.replace("/login?msg=Please log in to access this page.");
+        }
+    </script>
+    <!-- Chart.js for Biometric History Trends -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <span class="material-symbols-outlined">health_metrics</span>
+            </div>
+            <div>
+                <h1 class="brand-title">GlucoPredict AI</h1>
+                <p class="brand-subtitle">Clinical Portal</p>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="/input" id="nav-input-link" class="nav-item">
+                <span class="material-symbols-outlined">medical_services</span>
+                <span>Assessment</span>
+            </a>
+            <a href="/dashboard" id="nav-dashboard-link" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/patients" id="nav-patients-link" class="nav-item active">
+                <span class="material-symbols-outlined">groups</span>
+                <span>Patient Records</span>
+            </a>
+            <a href="/admin" id="nav-admin-link" class="nav-item" style="display: none;">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>Management</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item" onclick="UI.openSupportModal(); return false;">
+                <span class="material-symbols-outlined">help</span>
+                <span>Support & Info</span>
+            </a>
+            <a href="#" class="nav-item" onclick="Auth.logout(); return false;" style="color: var(--error);">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+        <!-- Top App Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="page-title-display" class="page-title">Patient Records</h2>
+            </div>
+            <div class="topbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-badge">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">medical_services</span>
+                    <span id="current-user-name" style="font-size: 13px; font-weight: 600;">Loading...</span>
+                    <span id="current-user-role" class="role-pill">...</span>
+                </div>
+                <button onclick="Auth.logout()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 12px; color: var(--error); border-color: var(--error-container);" title="Sign out of clinical session">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-body">
+            <!-- Header Banner -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h2 style="font-size: 24px; font-weight: 700; color: var(--text-main);">Clinical Patient Directory</h2>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">
+                        Manage patient registries, monitor diabetic risk trajectories, and review longitudinal assessment histories.
+                    </p>
+                </div>
+                <div>
+                    <a href="/input" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined">add</span> New Assessment
+                    </a>
+                </div>
+            </div>
+
+            <!-- Search & Filter Controls -->
+            <div class="card" style="margin-bottom: 24px; padding: 18px 20px;">
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                    <div style="flex: 1; min-width: 260px; position: relative;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 20px; pointer-events: none;">search</span>
+                        <input type="text" id="patient-search-input" class="form-control" placeholder="Search by patient name or email address..." style="padding-left: 40px;"/>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="risk-filter-select" style="font-size: 13px; font-weight: 600; color: var(--text-muted); white-space: nowrap;">Risk Level:</label>
+                        <select id="risk-filter-select" class="form-control" style="width: 170px;">
+                            <option value="">All Risk Levels</option>
+                            <option value="High">High Risk</option>
+                            <option value="Low">Low Risk</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="patients-loading" style="text-align: center; padding: 60px 20px; display: none;">
+                <span class="material-symbols-outlined spin" style="font-size: 36px; color: var(--primary);">sync</span>
+                <p style="font-size: 14px; color: var(--text-muted); margin-top: 12px;">Loading patient records...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="patients-error" class="alert alert-error" style="display: none; margin-bottom: 24px;"></div>
+
+            <!-- Empty State -->
+            <div id="patients-empty" class="card" style="display: none; text-align: center; padding: 60px 20px;">
+                <div class="brand-icon" style="margin: 0 auto 16px; width: 56px; height: 56px;">
+                    <span class="material-symbols-outlined" style="font-size: 32px;">person_search</span>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-main);">No Patients Found</h3>
+                <p id="empty-state-msg" style="font-size: 14px; color: var(--text-muted); max-width: 440px; margin: 8px auto 20px;">
+                    No registered patients match your current search and filter criteria.
+                </p>
+                <button id="clear-filters-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">clear_all</span> Clear Filters
+                </button>
+            </div>
+
+            <!-- Patients Table Container -->
+            <div id="patients-table-container" class="card" style="display: none; padding: 0; overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Email</th>
+                                <th>Age</th>
+                                <th>Total Assessments</th>
+                                <th>Latest Risk</th>
+                                <th>Confidence</th>
+                                <th>Last Assessment</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patients-table-body">
+                            <!-- Populated dynamically via patients.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Patient Record Detail Modal -->
+<div id="patient-detail-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <div class="modal-title-group">
+                <div class="modal-title-icon">
+                    <span class="material-symbols-outlined">clinical_notes</span>
+                </div>
+                <div>
+                    <div id="modal-patient-name" class="modal-title">Patient Profile</div>
+                    <div id="modal-patient-email" class="modal-subtitle">user@example.com</div>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closePatientDetailModal()" title="Close">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body" style="overflow-y: auto; flex: 1;">
+            <!-- Modal Actions Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; background: var(--surface-low); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <div>
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Latest Assessment Status:</span>
+                    <span id="modal-latest-risk-badge" class="badge" style="margin-left: 8px;">--</span>
+                    <span id="modal-latest-confidence" style="font-size: 13px; font-weight: 600; color: var(--text-main); margin-left: 8px;"></span>
+                </div>
+                <a id="modal-add-assessment-link" href="#" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Add Assessment for this Patient
+                </a>
+            </div>
+
+            <!-- Latest Vitals Grid -->
+            <div style="margin-bottom: 24px;">
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">vital_signs</span>
+                    Latest Clinical Vitals
+                </h4>
+                <div id="modal-vitals-container" class="grid-4" style="gap: 12px;">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Historical Biometric Trend Chart -->
+            <div style="margin-bottom: 24px;">
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">monitoring</span>
+                    Biometric History Over Time
+                </h4>
+                <div style="background: var(--surface-low); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; height: 260px; position: relative;">
+                    <canvas id="patientTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Assessments History Table -->
+            <div>
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">history</span>
+                    Historical Assessment Log
+                </h4>
+                <div class="table-responsive" style="border: 1px solid var(--border); border-radius: var(--radius-md); max-height: 240px; overflow-y: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Assessment Date</th>
+                                <th>Risk Level</th>
+                                <th>Confidence</th>
+                                <th>Glucose</th>
+                                <th>BMI</th>
+                                <th>Blood Pressure</th>
+                                <th>Model Used</th>
+                                <th style="text-align: right;">Report</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-history-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closePatientDetailModal()">Close Profile</button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/patients.js"></script>
+</body>
+</html>
+

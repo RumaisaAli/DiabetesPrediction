@@ -35,15 +35,19 @@
         </div>
 
         <nav class="nav-menu">
+            <a href="/input" class="nav-item active">
+                <span class="material-symbols-outlined">medical_services</span>
+                <span>Assessment</span>
+            </a>
             <a href="/dashboard" class="nav-item">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span>Dashboard</span>
             </a>
-            <a href="/input" class="nav-item active">
-                <span class="material-symbols-outlined">medical_services</span>
-                <span>Risk Predictor</span>
+            <a href="/patients" id="nav-patients-link" class="nav-item" style="display: none;">
+                <span class="material-symbols-outlined">groups</span>
+                <span>Patient Records</span>
             </a>
-            <a href="/admin" id="nav-admin-link" class="nav-item">
+            <a href="/admin" id="nav-admin-link" class="nav-item" style="display: none;">
                 <span class="material-symbols-outlined">admin_panel_settings</span>
                 <span>Management</span>
             </a>
@@ -99,6 +103,12 @@
                             Fill Sample High Risk
                         </button>
                     </div>
+                </div>
+
+                <!-- Patient Assessment Context Banner (Provider / Admin submitting for patient) -->
+                <div id="patient-banner" class="alert alert-info" style="display: none; align-items: center; gap: 8px; margin-bottom: 20px; font-weight: 500;">
+                    <span class="material-symbols-outlined">person</span>
+                    <span id="patient-banner-text">Entering data for: </span>
                 </div>
 
                 <div id="active-model-callout" style="display: flex; align-items: center; justify-content: space-between; background: var(--surface-low); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 20px; font-size: 13px;">

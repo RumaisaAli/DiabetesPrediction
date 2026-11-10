@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clinical Risk Predictor – Wireframe</title>
+<style>
+:root {
+    --primary: #35607f;
+    --primary-hover: #294b63;
+    --primary-light: #cae6ff;
+    --primary-container: #4f7999;
+    --on-primary: #ffffff;
+    --secondary: #615e57;
+    --secondary-container: #e7e2d9;
+    --background: #faf9f6;
+    --surface: #ffffff;
+    --surface-container: #efeeeb;
+    --surface-low: #f4f3f1;
+    --text-main: #1a1c1a;
+    --text-muted: #67645d;
+    --border: #e3e2e0;
+    --border-strong: #c2c7ce;
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+    --success: #1b5e20;
+    --success-container: #e8f5e9;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 20px rgba(53, 96, 127, 0.08);
+    --shadow-lg: 0 10px 30px rgba(53, 96, 127, 0.12);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background-color: var(--background); color: var(--text-main); line-height: 1.5; min-height: 100vh; }
+.app-container { display: flex; min-height: 100vh; }
+.sidebar {
+    width: 260px; background-color: var(--surface-low);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; padding: 24px 16px;
+}
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 12px 24px; border-bottom: 1px solid var(--border); }
+.brand-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-container));
+    color: var(--on-primary); border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: var(--shadow-sm);
+}
+.brand-title { font-size: 17px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+.brand-subtitle { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.nav-menu { margin-top: 24px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    border-radius: var(--radius-md); color: var(--secondary); font-weight: 500; font-size: 14px; text-decoration: none;
+}
+.nav-item.active { background-color: var(--secondary-container); color: var(--text-main); font-weight: 600; }
+.sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.main-content { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+    background-color: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 32px; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 90; box-shadow: var(--shadow-sm);
+}
+.page-title { font-size: 20px; font-weight: 700; color: var(--text-main); }
+.user-badge {
+    display: flex; align-items: center; gap: 10px; padding: 6px 14px;
+    background-color: var(--surface-low); border: 1px solid var(--border); border-radius: var(--radius-full);
+}
+.role-pill {
+    font-size: 11px; font-weight: 700; padding: 3px 8px;
+    border-radius: var(--radius-full); text-transform: uppercase;
+    background-color: var(--primary-light); color: var(--primary);
+}
+.content-body { padding: 32px; }
+.card {
+    background-color: var(--surface); border-radius: var(--radius-lg);
+    border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-md);
+}
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+    border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer; text-decoration: none;
+}
+.btn-primary { background-color: var(--primary); color: var(--on-primary); }
+.btn-secondary { background-color: var(--surface-container); color: var(--text-main); border-color: var(--border); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.form-group { margin-bottom: 20px; }
+.form-label {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; font-size: 13px; font-weight: 600;
+    color: var(--text-main); text-transform: uppercase; letter-spacing: 0.03em;
+}
+.form-label-hint {
+    font-size: 12px; font-weight: 500; color: var(--primary);
+    background: var(--primary-light); padding: 2px 8px; border-radius: var(--radius-full);
+}
+.form-control {
+    width: 100%; padding: 12px 16px; font-size: 14px;
+    border-radius: var(--radius-md); border: 1px solid var(--border-strong);
+    background-color: var(--surface); color: var(--text-main); outline: none;
+}
+.field-meta-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">⚕</div>
+            <div>
+                <div class="brand-title">GlucoPredict AI</div>
+                <div class="brand-subtitle">Clinical Portal</div>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a class="nav-item"><span>📊</span><span>Dashboard</span></a>
+            <a class="nav-item active"><span>🩺</span><span>Risk Predictor</span></a>
+            <a class="nav-item"><span>⚙</span><span>Management</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item"><span>❓</span><span>Support &amp; Info</span></a>
+            <a class="nav-item" style="color: var(--error);"><span>🚪</span><span>Log Out</span></a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2 class="page-title">Prediction Engine</h2>
+            <div class="user-badge">
+                <span>👤</span>
+                <span style="font-size: 13px; font-weight: 600;">Dr. Sarah Jenkins</span>
+                <span class="role-pill">CLINICIAN</span>
+                <button class="btn btn-sm" style="color: var(--error); border-color: var(--error-container); background: transparent; margin-left: 4px;">🚪 Sign Out</button>
+            </div>
+        </header>
+
+        <div class="content-body">
+            <div class="card" style="max-width: 960px; margin: 0 auto;">
+                <!-- Form Header -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 20px; font-weight: 700; color: var(--primary);">Enter Patient Clinical Vitals</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Provide all 8 biometric indicators to compute risk level and top contributing factors.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary btn-sm">Fill Sample Low Risk</button>
+                        <button class="btn btn-secondary btn-sm">Fill Sample High Risk</button>
+                    </div>
+                </div>
+
+                <!-- Active Model Callout -->
+                <div style="display: flex; align-items: center; justify-content: space-between; background: var(--surface-low); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 20px; font-size: 13px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: var(--primary);">🧠</span>
+                        <span>Inference Engine: Assessment will be evaluated by active model <strong style="color: var(--primary);">Neural Network (MLP)</strong></span>
+                    </div>
+                    <span style="font-size: 12px; color: var(--text-muted);">Accuracy: 88.3%</span>
+                </div>
+
+                <!-- 8-field Form -->
+                <form>
+                    <div class="grid-2">
+                        <!-- 1. Glucose -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Plasma Glucose Level <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">70 – 99 mg/dL</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 110 (Required)"/>
+                            <div class="field-meta-row"><span>Fasting blood sugar</span><span>Range: 40 – 400 mg/dL</span></div>
+                        </div>
+                        <!-- 2. BMI -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Body Mass Index (BMI) <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">18.5 – 24.9</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 26.5 (Required)"/>
+                            <div class="field-meta-row"><span>Weight (kg) / Height (m)²</span><span>Range: 10 – 70</span></div>
+                        </div>
+                        <!-- 3. Blood Pressure -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Diastolic Blood Pressure <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">60 – 80 mm Hg</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 74 (Required)"/>
+                            <div class="field-meta-row"><span>Diastolic arterial pressure</span><span>Range: 40 – 220 mm Hg</span></div>
+                        </div>
+                        <!-- 4. Age -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Patient Age <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">Years</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 35 (Required)"/>
+                            <div class="field-meta-row"><span>Age in completed years</span><span>Range: 18 – 120</span></div>
+                        </div>
+                        <!-- 5. Insulin -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Serum Insulin <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">16 – 166 μU/mL</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 85 (0 if unavailable)"/>
+                            <div class="field-meta-row"><span>2-Hour post-glucose serum insulin</span><span>Range: 0 – 900 μU/mL</span></div>
+                        </div>
+                        <!-- 6. Skin Thickness -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Triceps Skin Fold <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">10 – 25 mm</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 23 (0 if unavailable)"/>
+                            <div class="field-meta-row"><span>Skinfold caliper metric</span><span>Range: 0 – 99 mm</span></div>
+                        </div>
+                        <!-- 7. Pregnancies -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Pregnancies <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">Total count</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 1"/>
+                            <div class="field-meta-row"><span>Total number of pregnancies (0 for male)</span><span>Range: 0 – 25</span></div>
+                        </div>
+                        <!-- 8. Diabetes Pedigree Function -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>Diabetes Pedigree Function <span style="color:var(--error);">*</span></span>
+                                <span class="form-label-hint">0.05 – 0.50</span>
+                            </label>
+                            <input class="form-control" type="number" placeholder="e.g. 0.35"/>
+                            <div class="field-meta-row"><span>Genetic family history scoring</span><span>Range: 0.01 – 3.5</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                        <button type="reset" class="btn btn-secondary">Reset Fields</button>
+                        <button type="submit" class="btn btn-primary" style="min-width: 220px;">📊 Run Risk Assessment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

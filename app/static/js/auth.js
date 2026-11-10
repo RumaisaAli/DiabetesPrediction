@@ -102,6 +102,16 @@ const Auth = {
             roleBadgeEl.className = `role-pill ${user.role}`;
         }
 
+        // Manage sidebar navigation visibility by role
+        const patientsNav = document.getElementById("nav-patients-link");
+        if (patientsNav) {
+            if (user.role === "provider" || user.role === "admin") {
+                patientsNav.style.display = "flex";
+            } else {
+                patientsNav.style.display = "none";
+            }
+        }
+
         // Hide admin link for non-admins
         const adminNav = document.getElementById("nav-admin-link");
         if (adminNav) {
@@ -111,6 +121,18 @@ const Auth = {
                 adminNav.style.display = "none";
             }
         }
+
+        // Highlight active navigation menu item
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(".nav-menu .nav-item");
+        navLinks.forEach(link => {
+            const href = link.getAttribute("href");
+            if (href && (href === currentPath || (currentPath === "/" && href === "/dashboard"))) {
+                link.classList.add("active");
+            } else if (href) {
+                link.classList.remove("active");
+            }
+        });
 
         return user;
     }
@@ -349,16 +371,19 @@ window.addEventListener("pageshow", (event) => {
     const token = Auth.getToken();
     const user = Auth.getUser();
 
-    if (path === "/dashboard" || path === "/input" || path === "/admin") {
+    if (path === "/dashboard" || path === "/input" || path === "/admin" || path === "/patients") {
         if (!token || !user) {
             Auth.clear();
             window.location.replace("/login?msg=Please log in to access this page.");
         } else if (path === "/admin" && user.role !== "admin") {
             window.location.replace("/login?msg=Access denied: Administrative privileges required.");
+        } else if (path === "/patients" && user.role !== "provider" && user.role !== "admin") {
+            window.location.replace("/login?msg=Access denied: Provider or administrative privileges required.");
         }
     } else if (path === "/login") {
         if (token && user) {
-            window.location.replace(user.role === "admin" ? "/admin" : "/dashboard");
+            const target = user.role === "admin" ? "/admin" : (user.role === "provider" ? "/patients" : "/dashboard");
+            window.location.replace(target);
         }
     }
 });

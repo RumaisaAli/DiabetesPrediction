@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Patient Dashboard – Wireframe</title>
+<style>
+:root {
+    --primary: #35607f;
+    --primary-hover: #294b63;
+    --primary-light: #cae6ff;
+    --primary-container: #4f7999;
+    --on-primary: #ffffff;
+    --secondary: #615e57;
+    --secondary-container: #e7e2d9;
+    --background: #faf9f6;
+    --surface: #ffffff;
+    --surface-container: #efeeeb;
+    --surface-low: #f4f3f1;
+    --text-main: #1a1c1a;
+    --text-muted: #67645d;
+    --border: #e3e2e0;
+    --border-strong: #c2c7ce;
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+    --success: #1b5e20;
+    --success-container: #e8f5e9;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 20px rgba(53, 96, 127, 0.08);
+    --shadow-lg: 0 10px 30px rgba(53, 96, 127, 0.12);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background-color: var(--background); color: var(--text-main); line-height: 1.5; min-height: 100vh; }
+.app-container { display: flex; min-height: 100vh; }
+.sidebar {
+    width: 260px; background-color: var(--surface-low);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; padding: 24px 16px;
+}
+.brand {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 12px 24px; border-bottom: 1px solid var(--border);
+}
+.brand-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-container));
+    color: var(--on-primary); border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: var(--shadow-sm);
+}
+.brand-title { font-size: 17px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+.brand-subtitle { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.nav-menu { margin-top: 24px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    border-radius: var(--radius-md); color: var(--secondary); font-weight: 500; font-size: 14px;
+    text-decoration: none;
+}
+.nav-item.active { background-color: var(--secondary-container); color: var(--text-main); font-weight: 600; }
+.nav-icon { font-size: 20px; }
+.sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.main-content { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+    background-color: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 32px; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 90; box-shadow: var(--shadow-sm);
+}
+.page-title { font-size: 20px; font-weight: 700; color: var(--text-main); }
+.user-badge {
+    display: flex; align-items: center; gap: 10px; padding: 6px 14px;
+    background-color: var(--surface-low); border: 1px solid var(--border); border-radius: var(--radius-full);
+}
+.role-pill {
+    font-size: 11px; font-weight: 700; padding: 3px 8px;
+    border-radius: var(--radius-full); text-transform: uppercase;
+    background-color: var(--success-container); color: var(--success);
+}
+.content-body { padding: 32px; }
+.card {
+    background-color: var(--surface); border-radius: var(--radius-lg);
+    border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-md);
+}
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+    border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer; text-decoration: none;
+}
+.btn-primary { background-color: var(--primary); color: var(--on-primary); }
+.btn-secondary { background-color: var(--surface-container); color: var(--text-main); border-color: var(--border); }
+.btn-outline { background-color: transparent; border-color: var(--primary); color: var(--primary); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+.col-span-4 { grid-column: span 4; }
+.col-span-8 { grid-column: span 8; }
+.col-span-6 { grid-column: span 6; }
+.col-span-12 { grid-column: span 12; }
+.badge {
+    display: inline-flex; align-items: center; padding: 4px 10px;
+    border-radius: var(--radius-full); font-size: 12px; font-weight: 600;
+}
+.badge-high-risk { background-color: var(--error-container); color: var(--error); }
+.badge-low-risk { background-color: var(--success-container); color: var(--success); }
+.badge-active { background-color: var(--primary-light); color: var(--primary); }
+/* Gauge placeholder */
+.gauge-container {
+    position: relative; width: 180px; height: 180px;
+    margin: 0 auto; display: flex; align-items: center; justify-content: center;
+}
+.gauge-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.gauge-circle-bg { fill: none; stroke: var(--surface-container); stroke-width: 12; }
+.gauge-circle-fill { fill: none; stroke-width: 12; stroke-linecap: round; stroke: var(--error); }
+.gauge-text { position: absolute; text-align: center; }
+.gauge-value { font-size: 32px; font-weight: 700; line-height: 1; color: var(--error); }
+.gauge-label { font-size: 13px; font-weight: 600; margin-top: 4px; color: var(--text-muted); }
+/* Stat card */
+.stat-card { text-align: left; }
+.stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-val { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 6px; }
+.stat-sub { font-size: 11px; color: var(--success); font-weight: 600; margin-top: 2px; }
+/* Chart placeholder */
+.chart-placeholder {
+    background: var(--surface-low); border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-md); height: 240px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 13px; font-style: italic;
+    position: relative; overflow: hidden;
+}
+/* Table */
+.custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.custom-table th {
+    background-color: var(--surface-low); color: var(--text-muted); font-weight: 600;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.custom-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+/* Recommendation */
+.recommendation-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px;
+    background-color: var(--surface-low); border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary); font-size: 14px; margin-bottom: 10px;
+}
+.recommendation-item.high-priority { border-left-color: var(--error); background-color: #fff8f8; }
+/* SVG bar chart placeholder */
+.factors-bar { display: flex; flex-direction: column; gap: 10px; }
+.factor-row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.factor-label { width: 160px; color: var(--text-muted); font-weight: 500; text-align: right; }
+.factor-bar-wrap { flex: 1; background: var(--surface-container); border-radius: var(--radius-full); height: 10px; }
+.factor-bar { height: 10px; border-radius: var(--radius-full); background: var(--primary); }
+.factor-pct { width: 36px; font-size: 12px; font-weight: 700; color: var(--text-main); }
+</style>
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">⚕</div>
+            <div>
+                <div class="brand-title">GlucoPredict AI</div>
+                <div class="brand-subtitle">Clinical Portal</div>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-item">
+                <span class="nav-icon">🩺</span>
+                <span>Risk Predictor</span>
+            </a>
+            <a class="nav-item">
+                <span class="nav-icon">⚙</span>
+                <span>Management</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item">
+                <span class="nav-icon">❓</span>
+                <span>Support &amp; Info</span>
+            </a>
+            <a class="nav-item" style="color: var(--error);">
+                <span class="nav-icon">🚪</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <h2 class="page-title">Patient Health Dashboard</h2>
+            <div class="user-badge">
+                <span>👤</span>
+                <span style="font-size: 13px; font-weight: 600;">Sarah Jenkins</span>
+                <span class="role-pill">PATIENT</span>
+                <button class="btn btn-sm" style="color: var(--error); border-color: var(--error-container); background: transparent; margin-left: 4px;">🚪 Sign Out</button>
+            </div>
+        </header>
+
+        <div class="content-body">
+            <!-- Greeting Banner -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h2 style="font-size: 26px; font-weight: 700; color: var(--text-main);">Good day, Sarah Jenkins 👋</h2>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">Review your clinical risk profile, contributing biometric factors, and tailored health journey.</p>
+                    <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); background: var(--surface-low); padding: 4px 12px; border-radius: var(--radius-full); border: 1px solid var(--border);">
+                        🧠 Active System Model: <strong style="color: var(--primary);">Neural Network (MLP)</strong>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary">💬 Submit Feedback</button>
+                    <button class="btn btn-outline">⬇ Download Report (PDF)</button>
+                    <a class="btn btn-primary">➕ New Assessment</a>
+                </div>
+            </div>
+
+            <!-- Bento Grid -->
+            <div class="grid-12">
+                <!-- Card 1: Gauge -->
+                <div class="col-span-4 card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Current Assessment</span>
+                            <span class="badge badge-high-risk">⚠ High Risk</span>
+                        </div>
+                        <!-- SVG Gauge -->
+                        <div class="gauge-container">
+                            <svg class="gauge-svg" viewBox="0 0 200 200">
+                                <circle class="gauge-circle-bg" cx="100" cy="100" r="88"/>
+                                <circle class="gauge-circle-fill" cx="100" cy="100" r="88"
+                                    stroke-dasharray="552.9"
+                                    stroke-dashoffset="138"/>
+                            </svg>
+                            <div class="gauge-text">
+                                <div class="gauge-value">75%</div>
+                                <div class="gauge-label">Confidence Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;">
+                        <div>Model: <b style="color: var(--text-main);">Neural Network</b></div>
+                        <div>Oct 12, 2026</div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Contributing Factors -->
+                <div class="col-span-8 card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 16px; font-weight: 700;">Top Contributing Risk Factors</h3>
+                        <span style="font-size: 12px; color: var(--text-muted);">Relative Clinical Impact (%)</span>
+                    </div>
+                    <div class="factors-bar" style="margin-top: 8px;">
+                        <div class="factor-row">
+                            <div class="factor-label">Plasma Glucose</div>
+                            <div class="factor-bar-wrap"><div class="factor-bar" style="width: 82%;"></div></div>
+                            <div class="factor-pct">82%</div>
+                        </div>
+                        <div class="factor-row">
+                            <div class="factor-label">BMI</div>
+                            <div class="factor-bar-wrap"><div class="factor-bar" style="width: 64%;"></div></div>
+                            <div class="factor-pct">64%</div>
+                        </div>
+                        <div class="factor-row">
+                            <div class="factor-label">Age</div>
+                            <div class="factor-bar-wrap"><div class="factor-bar" style="width: 48%;"></div></div>
+                            <div class="factor-pct">48%</div>
+                        </div>
+                        <div class="factor-row">
+                            <div class="factor-label">Insulin</div>
+                            <div class="factor-bar-wrap"><div class="factor-bar" style="width: 35%;"></div></div>
+                            <div class="factor-pct">35%</div>
+                        </div>
+                        <div class="factor-row">
+                            <div class="factor-label">Diabetes Pedigree</div>
+                            <div class="factor-bar-wrap"><div class="factor-bar" style="width: 28%;"></div></div>
+                            <div class="factor-pct">28%</div>
+                        </div>
+                        <div class="factor-row">
+                            <div class="factor-label">Blood Pressure</div>
+                            <div class="factor-bar-wrap"><div class="factor-bar" style="width: 18%;"></div></div>
+                            <div class="factor-pct">18%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Recommendations -->
+                <div class="col-span-6 card">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <span style="font-size: 20px;">🛡</span>
+                        <h3 style="font-size: 16px; font-weight: 700;">Personalized Recommendations</h3>
+                    </div>
+                    <div class="recommendation-item high-priority">
+                        <span>⚠</span>
+                        <span>Consult an endocrinologist and request fasting glucose &amp; HbA1c tests immediately.</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <span>🥗</span>
+                        <span>Adopt a low-glycaemic diet: reduce refined carbohydrates and increase dietary fibre intake.</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <span>🏃</span>
+                        <span>Engage in at least 150 min/week of moderate aerobic exercise (walking, swimming).</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <span>📅</span>
+                        <span>Schedule a follow-up biometric assessment in 4 weeks to track glucose trends.</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Trend Chart -->
+                <div class="col-span-6 card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 16px; font-weight: 700;">Biometric Trend Over Time</h3>
+                        <span style="font-size: 12px; color: var(--text-muted);">Glucose &amp; BMI History</span>
+                    </div>
+                    <div class="chart-placeholder" style="height: 200px;">
+                        <!-- Simple SVG line chart illustration -->
+                        <svg width="100%" height="100%" viewBox="0 0 400 160" preserveAspectRatio="none">
+                            <polyline points="20,130 80,110 140,95 200,85 260,78 320,72 380,60"
+                                fill="none" stroke="#35607f" stroke-width="2.5" stroke-linejoin="round"/>
+                            <polyline points="20,100 80,108 140,104 200,98 260,92 320,88 380,80"
+                                fill="none" stroke="#ba1a1a" stroke-width="2" stroke-dasharray="6,3" stroke-linejoin="round"/>
+                            <text x="20" y="150" font-size="10" fill="#67645d">Aug</text>
+                            <text x="80" y="150" font-size="10" fill="#67645d">Sep</text>
+                            <text x="140" y="150" font-size="10" fill="#67645d">Sep</text>
+                            <text x="200" y="150" font-size="10" fill="#67645d">Oct</text>
+                            <text x="260" y="150" font-size="10" fill="#67645d">Oct</text>
+                            <text x="320" y="150" font-size="10" fill="#67645d">Oct</text>
+                            <text x="380" y="150" font-size="10" fill="#67645d">Oct</text>
+                        </svg>
+                        <div style="position: absolute; top: 10px; right: 12px; display: flex; gap: 16px; font-size: 11px;">
+                            <span style="display: flex; align-items: center; gap: 4px;"><span style="display: inline-block; width: 16px; height: 2px; background: var(--primary);"></span> Glucose</span>
+                            <span style="display: flex; align-items: center; gap: 4px;"><span style="display: inline-block; width: 16px; height: 2px; background: var(--error);"></span> BMI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: History Table -->
+                <div class="col-span-12 card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 16px; font-weight: 700;">Assessment History Log</h3>
+                        <span style="font-size: 12px; color: var(--text-muted);">All historical evaluations stored in PostgreSQL</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Risk Level</th>
+                                    <th>Confidence</th>
+                                    <th>Glucose</th>
+                                    <th>BMI</th>
+                                    <th>Model Used</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Oct 12, 2026</td>
+                                    <td><span class="badge badge-high-risk">High Risk</span></td>
+                                    <td>75.3%</td>
+                                    <td>148 mg/dL</td>
+                                    <td>32.4</td>
+                                    <td>Neural Network (MLP)</td>
+                                    <td><button class="btn btn-sm btn-outline">⬇ PDF</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Sep 28, 2026</td>
+                                    <td><span class="badge badge-high-risk">High Risk</span></td>
+                                    <td>71.8%</td>
+                                    <td>139 mg/dL</td>
+                                    <td>31.9</td>
+                                    <td>Logistic Regression</td>
+                                    <td><button class="btn btn-sm btn-outline">⬇ PDF</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Sep 10, 2026</td>
+                                    <td><span class="badge badge-low-risk">Low Risk</span></td>
+                                    <td>62.1%</td>
+                                    <td>112 mg/dL</td>
+                                    <td>29.3</td>
+                                    <td>SVM</td>
+                                    <td><button class="btn btn-sm btn-outline">⬇ PDF</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

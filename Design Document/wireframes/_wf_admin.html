@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Operations – Wireframe</title>
+<style>
+:root {
+    --primary: #35607f;
+    --primary-hover: #294b63;
+    --primary-light: #cae6ff;
+    --primary-container: #4f7999;
+    --on-primary: #ffffff;
+    --secondary: #615e57;
+    --secondary-container: #e7e2d9;
+    --background: #faf9f6;
+    --surface: #ffffff;
+    --surface-container: #efeeeb;
+    --surface-low: #f4f3f1;
+    --text-main: #1a1c1a;
+    --text-muted: #67645d;
+    --border: #e3e2e0;
+    --border-strong: #c2c7ce;
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+    --success: #1b5e20;
+    --success-container: #e8f5e9;
+    --warning: #b78103;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 20px rgba(53, 96, 127, 0.08);
+    --shadow-lg: 0 10px 30px rgba(53, 96, 127, 0.12);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background-color: var(--background); color: var(--text-main); line-height: 1.5; min-height: 100vh; }
+.app-container { display: flex; min-height: 100vh; }
+.sidebar {
+    width: 260px; background-color: var(--surface-low);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; padding: 24px 16px;
+}
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 12px 24px; border-bottom: 1px solid var(--border); }
+.brand-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-container));
+    color: var(--on-primary); border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: var(--shadow-sm);
+}
+.brand-title { font-size: 17px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+.brand-subtitle { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.nav-menu { margin-top: 24px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    border-radius: var(--radius-md); color: var(--secondary); font-weight: 500; font-size: 14px; text-decoration: none;
+}
+.nav-item.active { background-color: var(--secondary-container); color: var(--text-main); font-weight: 600; }
+.sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.main-content { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+    background-color: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 32px; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 90; box-shadow: var(--shadow-sm);
+}
+.page-title { font-size: 20px; font-weight: 700; color: var(--text-main); }
+.user-badge {
+    display: flex; align-items: center; gap: 10px; padding: 6px 14px;
+    background-color: var(--surface-low); border: 1px solid var(--border); border-radius: var(--radius-full);
+}
+.role-pill.admin { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full); text-transform: uppercase; background-color: #f3e5f5; color: #6a1b9a; }
+.content-body { padding: 32px; }
+.card {
+    background-color: var(--surface); border-radius: var(--radius-lg);
+    border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-md);
+}
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+    border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer;
+}
+.btn-primary { background-color: var(--primary); color: var(--on-primary); }
+.btn-secondary { background-color: var(--surface-container); color: var(--text-main); border-color: var(--border); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-block { width: 100%; }
+.btn-danger { background-color: var(--error); color: #ffffff; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.badge {
+    display: inline-flex; align-items: center; padding: 4px 10px;
+    border-radius: var(--radius-full); font-size: 12px; font-weight: 600;
+}
+.badge-active { background-color: var(--primary-light); color: var(--primary); }
+.badge-trained { background-color: var(--secondary-container); color: var(--secondary); }
+.custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.custom-table th {
+    background-color: var(--surface-low); color: var(--text-muted); font-weight: 600;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.custom-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.form-group { margin-bottom: 16px; }
+.form-control {
+    width: 100%; padding: 12px 16px; font-size: 14px;
+    border-radius: var(--radius-md); border: 1px solid var(--border-strong);
+    background-color: var(--surface); color: var(--text-main); outline: none;
+}
+</style>
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">⚕</div>
+            <div>
+                <div class="brand-title">GlucoPredict AI</div>
+                <div class="brand-subtitle">Admin Operations</div>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a class="nav-item"><span>📊</span><span>Dashboard</span></a>
+            <a class="nav-item"><span>🩺</span><span>Risk Predictor</span></a>
+            <a class="nav-item active"><span>⚙</span><span>Management</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item"><span>❓</span><span>Support &amp; Info</span></a>
+            <a class="nav-item" style="color: var(--error);"><span>🚪</span><span>Log Out</span></a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2 class="page-title">Admin Operations &amp; Model Management</h2>
+            <div class="user-badge">
+                <span>⚙</span>
+                <span style="font-size: 13px; font-weight: 600;">Administrator</span>
+                <span class="role-pill admin">ADMIN</span>
+                <button class="btn btn-sm" style="color: var(--error); border-color: var(--error-container); background: transparent; margin-left: 4px;">🚪 Sign Out</button>
+            </div>
+        </header>
+
+        <div class="content-body">
+            <!-- KPI Stat Cards -->
+            <div class="grid-4" style="margin-bottom: 24px;">
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Active Runtime Model</span>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 6px;">Neural Network</div>
+                    <span style="font-size: 11px; color: var(--success); font-weight: 600;">Pure-Python Imported Module</span>
+                </div>
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Total Predictions Logged</span>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-top: 6px;">1,420</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Stored in PostgreSQL</span>
+                </div>
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Registered Patients</span>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-top: 6px;">84</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Role: Patient</span>
+                </div>
+                <div class="card" style="padding: 20px;">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Avg Prediction Latency</span>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--success); margin-top: 6px;">18ms</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">&lt; 3000ms SLA Target</span>
+                </div>
+            </div>
+
+            <!-- ML Models Registry Table -->
+            <div class="card" style="margin-bottom: 28px; padding: 0; overflow: hidden;">
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h3 style="font-size: 17px; font-weight: 700; color: var(--text-main);">Machine Learning Models Registry</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Evaluation metrics, test set accuracy, F1 score, and runtime activation status.</p>
+                    </div>
+                    <button class="btn btn-primary">🔄 Retrain All Models</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Model Architecture</th>
+                                <th>Status</th>
+                                <th>Test Accuracy</th>
+                                <th>F1 Score</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>Last Trained</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Neural Network (MLP)</strong></td>
+                                <td><span class="badge badge-active">● ACTIVE</span></td>
+                                <td>88.3%</td>
+                                <td>0.86</td>
+                                <td>0.87</td>
+                                <td>0.85</td>
+                                <td>Oct 10, 2026</td>
+                                <td><button class="btn btn-sm" style="background: var(--success-container); color: var(--success); border: none;">Set Active</button></td>
+                            </tr>
+                            <tr>
+                                <td>Logistic Regression</td>
+                                <td><span class="badge badge-trained">Trained</span></td>
+                                <td>93.1%</td>
+                                <td>0.91</td>
+                                <td>0.92</td>
+                                <td>0.90</td>
+                                <td>Oct 10, 2026</td>
+                                <td><button class="btn btn-sm btn-secondary">Set Active</button></td>
+                            </tr>
+                            <tr>
+                                <td>Support Vector Machine (SVM)</td>
+                                <td><span class="badge badge-trained">Trained</span></td>
+                                <td>91.7%</td>
+                                <td>0.89</td>
+                                <td>0.90</td>
+                                <td>0.88</td>
+                                <td>Oct 10, 2026</td>
+                                <td><button class="btn btn-sm btn-secondary">Set Active</button></td>
+                            </tr>
+                            <tr>
+                                <td>Decision Tree</td>
+                                <td><span class="badge badge-trained">Trained</span></td>
+                                <td>83.2%</td>
+                                <td>0.80</td>
+                                <td>0.81</td>
+                                <td>0.79</td>
+                                <td>Oct 10, 2026</td>
+                                <td><button class="btn btn-sm btn-secondary">Set Active</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Upload + Datasets Grid -->
+            <div class="grid-2" style="margin-bottom: 28px;">
+                <!-- Upload Card -->
+                <div class="card">
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Upload Training Dataset</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                        Upload a new CSV dataset with the standard 8 clinical features and binary Outcome column.
+                    </p>
+                    <div class="form-group">
+                        <input type="file" class="form-control" accept=".csv"/>
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">Supported format: CSV (.csv) only. Non-CSV files will be rejected.</small>
+                    </div>
+                    <button class="btn btn-secondary btn-block">📤 Upload Dataset</button>
+                </div>
+
+                <!-- Datasets Table Card -->
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
+                        <h3 style="font-size: 16px; font-weight: 700;">Available Datasets</h3>
+                    </div>
+                    <div style="max-height: 240px; overflow-y: auto;">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Dataset Filename</th>
+                                    <th>Rows</th>
+                                    <th>Uploaded</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>diabetes.csv</td>
+                                    <td>768</td>
+                                    <td>Oct 10, 2026</td>
+                                    <td><span class="badge badge-active">Active</span></td>
+                                    <td><button class="btn btn-sm btn-primary">🔄 Retrain</button></td>
+                                </tr>
+                                <tr>
+                                    <td>diabetes_v2.csv</td>
+                                    <td>512</td>
+                                    <td>Sep 28, 2026</td>
+                                    <td><span class="badge badge-trained">Archived</span></td>
+                                    <td><button class="btn btn-sm btn-secondary">Use</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Panel -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
+                    <h3 style="font-size: 17px; font-weight: 700;">User Feedback &amp; Clinical Suggestions</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Observations and feedback submitted by patients and healthcare providers.</p>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Submitted By</th>
+                                <th>Feedback Message</th>
+                                <th>Date Submitted</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>sarah_jenkins (Patient)</td>
+                                <td>The glucose recommendation was very clear and helpful.</td>
+                                <td>Oct 12, 2026</td>
+                                <td><span class="badge" style="background: var(--success-container); color: var(--success);">Reviewed</span></td>
+                            </tr>
+                            <tr>
+                                <td>dr_ali (Clinician)</td>
+                                <td>Please add HbA1c as an additional input field for better accuracy.</td>
+                                <td>Oct 11, 2026</td>
+                                <td><span class="badge" style="background: #fff8e1; color: var(--warning);">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>john_doe (Patient)</td>
+                                <td>The PDF report was very professionally formatted. Great work.</td>
+                                <td>Oct 09, 2026</td>
+                                <td><span class="badge" style="background: var(--success-container); color: var(--success);">Reviewed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

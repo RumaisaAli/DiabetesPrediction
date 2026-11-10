@@ -8,6 +8,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = Auth.initPage("Health Assessment & Risk Predictor", ["patient", "provider", "admin"]);
     if (!user) return;
 
+    // Check if patient_id parameter is present in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetPatientId = urlParams.get("patient_id");
+    if (targetPatientId && (user.role === "provider" || user.role === "admin")) {
+        Auth.fetchWithAuth(`/api/patients/${targetPatientId}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(patient => {
+                if (patient) {
+                    const banner = document.getElementById("patient-banner");
+                    const bannerText = document.getElementById("patient-banner-text");
+                    if (banner && bannerText) {
+                        bannerText.textContent = `Entering data for: ${patient.username} (${patient.email})`;
+                        banner.style.display = "flex";
+                    }
+                }
+            })
+            .catch(err => console.error("Could not load patient details", err));
+    }
+
     // Load active model name
     fetch("/api/active-model")
         .then(r => r.json())
@@ -90,6 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
             errorAlert.textContent = "Please resolve the highlighted errors before submitting.";
             errorAlert.style.display = "flex";
             return;
+        }
+
+        if (targetPatientId) {
+            payload.patient_id = parseInt(targetPatientId, 10);
         }
 
         // 2. Submit to FastAPI Backend (/api/predict)

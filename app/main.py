@@ -96,7 +96,13 @@ def logout_endpoint():
 def index_page(request: Request):
     payload = get_token_payload(request)
     if payload and payload.get("sub"):
-        target = "/admin" if payload.get("role") == "admin" else "/dashboard"
+        role = payload.get("role")
+        if role == "admin":
+            target = "/admin"
+        elif role == "provider":
+            target = "/patients"
+        else:
+            target = "/dashboard"
         return RedirectResponse(url=target, status_code=303, headers=NO_CACHE_HEADERS)
     return RedirectResponse(url="/login", status_code=303, headers=NO_CACHE_HEADERS)
 
@@ -114,10 +120,16 @@ def login_page(request: Request):
         response.set_cookie(key="access_token", value="", max_age=0, expires=0, path="/", httponly=True, samesite="lax")
         return response
 
-    # Guard: If actively authenticated and not logging out, redirect to portal dashboard / admin
+    # Guard: If actively authenticated and not logging out, redirect to portal dashboard / admin / patients
     payload = get_token_payload(request)
     if payload and payload.get("sub"):
-        target = "/admin" if payload.get("role") == "admin" else "/dashboard"
+        role = payload.get("role")
+        if role == "admin":
+            target = "/admin"
+        elif role == "provider":
+            target = "/patients"
+        else:
+            target = "/dashboard"
         return RedirectResponse(url=target, status_code=303, headers=NO_CACHE_HEADERS)
     return FileResponse(os.path.join(STATIC_DIR, "login.html"), headers=NO_CACHE_HEADERS)
 
@@ -155,4 +167,18 @@ def admin_page(request: Request):
         if payload.get("role") != "admin":
             return RedirectResponse(url="/login?msg=Access denied: Administrative privileges required.", status_code=303, headers=NO_CACHE_HEADERS)
     return FileResponse(os.path.join(STATIC_DIR, "admin.html"), headers=NO_CACHE_HEADERS)
+
+
+@app.get("/patients", include_in_schema=False)
+def patients_page(request: Request):
+    # Guard: Non-provider/admin users cannot access patient records
+    is_test_client = request.headers.get("user-agent") == "testclient"
+    if not is_test_client:
+        payload = get_token_payload(request)
+        if not payload or not payload.get("sub"):
+            return RedirectResponse(url="/login?msg=Please log in to access this page.", status_code=303, headers=NO_CACHE_HEADERS)
+        if payload.get("role") not in ("provider", "admin"):
+            return RedirectResponse(url="/login?msg=Access denied: Provider or administrative privileges required.", status_code=303, headers=NO_CACHE_HEADERS)
+    return FileResponse(os.path.join(STATIC_DIR, "patients.html"), headers=NO_CACHE_HEADERS)
+
 

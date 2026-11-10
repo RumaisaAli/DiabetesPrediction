@@ -5,6 +5,9 @@
 **Author:** Rumaisa Ali & Group  
 **Live At** https://intelligent-diabetes-predictor.vercel.app/
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?style=for-the-badge&logo=vercel)](https://intelligent-diabetes-predictor.vercel.app/)  
+🌐 **Live URL:** [https://intelligent-diabetes-predictor.vercel.app/](https://intelligent-diabetes-predictor.vercel.app/)
+
 ---
 
 > [!IMPORTANT]
@@ -121,9 +124,9 @@ Administrators can initiate model retraining from the Admin Panel. The system ev
 ## 5. User Roles & Main Features
 
 ### User Roles
-- **Patient:** Self-service portal to submit vitals, view instantaneous risk results, analyze contributing risk factors, track health metrics over time, and download formal clinical reports.
-- **Healthcare Provider (Doctor):** Clinical workflow to input diagnostic records for patients and monitor patient risk progression.
-- **Administrator:** System-level oversight, including dataset CSV uploads, model retraining, active algorithm promotion, and user feedback review.
+- **Patient:** Self-service portal to submit vitals (`/input`), view instantaneous risk results (`/dashboard`), analyze contributing risk factors, track health metrics over time, and download formal clinical reports.
+- **Healthcare Provider (Doctor):** Dedicated 3-page clinical portal with Health Assessment (`/input`), Dashboard (`/dashboard`), and Patient Records (`/patients`) to search/filter patient directories, review detailed patient histories, analyze longitudinal biometric trends, and generate assessment reports.
+- **Administrator:** System-level oversight across all 4 portal pages (`/input`, `/dashboard`, `/patients`, `/admin`), including dataset CSV uploads, model retraining, active algorithm promotion, and user feedback review.
 
 ### Main Features
 - **Real-Time Risk Scoring:** Instant classification into Low, Moderate, or High Risk with an exact confidence percentage.
@@ -143,13 +146,17 @@ DiabetesPrediction/
 │   ├── api/                     # REST API route handlers
 │   │   ├── admin.py             # Model retraining, datasets, feedback
 │   │   ├── auth.py              # Login, registration, token verification
-│   │   ├── health_records.py    # Health input and patient vitals
-│   │   ├── predict.py           # ML inference endpoint
-│   │   └── reports.py           # Vector PDF report generation
+│   │   ├── deps.py              # Route dependencies, DB session & RBAC guards
+│   │   ├── feedback.py          # Clinical feedback submissions
+│   │   ├── patients.py          # Provider patient directory & clinical history
+│   │   └── predict.py           # ML inference, health records & PDF reports
 │   ├── ml/                      # Machine learning engine
+│   │   ├── inference.py         # Dynamic active model runner & feature impact calculator
 │   │   ├── models/              # Pure Python models (LR, SVM, DT, NN)
-│   │   ├── model_runner.py      # Dynamic active model loader & evaluator
-│   │   └── scaler.py            # Pure Python StandardScaler
+│   │   ├── recommendations.py   # Clinical recommendations generator
+│   │   ├── report_generator.py  # ReportLab vector PDF report generator
+│   │   ├── scaler.py            # Pure Python StandardScaler
+│   │   └── train.py             # Model training & parameter export pipeline
 │   ├── models/                  # SQLAlchemy 2.0 ORM entities
 │   │   ├── user.py              # Users and roles
 │   │   ├── health_record.py     # Patient vitals records
@@ -157,16 +164,28 @@ DiabetesPrediction/
 │   │   ├── ml_model.py          # Model performance and status metadata
 │   │   ├── dataset.py           # Uploaded training datasets
 │   │   └── feedback.py          # User feedback entries
+│   ├── schemas/                 # Pydantic v2 validation schemas
+│   │   ├── admin.py             # Admin metrics and datasets
+│   │   ├── auth.py              # User authentication & JWT tokens
+│   │   ├── feedback.py          # Feedback schemas
+│   │   ├── health.py            # Vitals inputs & prediction responses
+│   │   └── patients.py          # Patient summary & detail models
 │   ├── static/                  # Vanilla frontend assets
 │   │   ├── login.html           # Authentication portal
 │   │   ├── input.html           # Clinical vitals input form
 │   │   ├── dashboard.html       # Patient results, gauge, trends, reports
+│   │   ├── patients.html        # Provider patient directory & history portal
 │   │   ├── admin.html           # Administrator panel & model controls
-│   │   ├── css/styles.css       # Core clinical design system
+│   │   ├── css/style.css        # Core clinical design system
 │   │   └── js/                  # Vanilla ES6 JavaScript modules
+│   │       ├── admin.js         # Admin panel client logic
+│   │       ├── auth.js          # Auth, RBAC guards & shared layout
+│   │       ├── dashboard.js     # Results visualization & trend charts
+│   │       ├── patients.js      # Patient directory, modal & trends
+│   │       └── predict.js       # Vitals input form validation & submit
 │   ├── config.py                # Environment settings & configuration
 │   ├── database.py              # SQLAlchemy engine & session factory
-│   ├── main.py                  # FastAPI application entrypoint
+│   ├── main.py                  # FastAPI application entrypoint & page routing
 │   └── security.py              # Password hashing & JWT token handling
 ├── migrations/                  # Alembic database migrations
 ├── scripts/
@@ -175,7 +194,8 @@ DiabetesPrediction/
 ├── tests/
 │   ├── conftest.py              # Test fixtures & test DB setup
 │   ├── test_all_20_cases.py     # Full SRS test suite (TC-01 to TC-20)
-│   └── test_models_equivalence.py # Model numerical parity verification
+│   ├── test_models_equivalence.py # Model numerical parity verification
+│   └── test_patient_records.py  # Provider patient portal test suite (TC-21 to TC-28)
 ├── .env.example                 # Example environment configuration
 ├── docker-compose.yml           # Multi-container Docker orchestration
 ├── Dockerfile                   # Application container definition
@@ -252,6 +272,13 @@ Access the application at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ---
 
+### Option C: Cloud Deployment (Vercel)
+
+The production build of the platform is hosted live at:  
+👉 **[https://intelligent-diabetes-predictor.vercel.app/](https://intelligent-diabetes-predictor.vercel.app/)**
+
+---
+
 ## 8. Configuration & Security Considerations
 
 > [!WARNING]
@@ -289,9 +316,10 @@ FastAPI automatically generates comprehensive interactive documentation:
 | **Auth** | `POST` | `/api/auth/register` | Public | Registers a new patient user account |
 | **Auth** | `GET` | `/api/auth/me` | Authenticated | Retrieves profile information for current session |
 | **Prediction** | `POST` | `/api/predict` | Authenticated | Evaluates 8 patient vitals against active ML model and returns risk |
-| **Records** | `POST` | `/api/health-records` | Authenticated | Persists clinical vitals record and triggers assessment |
-| **Records** | `GET` | `/api/health-records/patient/{id}` | Authenticated | Retrieves longitudinal vitals history for trend analysis |
-| **Reports** | `GET` | `/api/reports/download/{id}` | Authenticated | Generates and downloads formal ReportLab vector PDF report |
+| **Records** | `GET` | `/api/records` | Authenticated | Retrieves chronological past health records and prediction trends |
+| **Reports** | `GET` | `/api/report/{prediction_id}/pdf` | Authenticated | Generates and downloads official clinical assessment PDF report |
+| **Patients** | `GET` | `/api/patients` | Provider, Admin | Lists registered patients with search, risk filter, and assessment totals |
+| **Patients** | `GET` | `/api/patients/{patient_id}` | Provider, Admin | Retrieves patient detail, latest vitals, and chronological history |
 | **Models** | `GET` | `/api/active-model` | Public | Returns current active model metadata and accuracy |
 | **Admin** | `GET` | `/api/admin/models` | Admin Only | Lists all trained models, versions, metrics, and active states |
 | **Admin** | `POST` | `/api/admin/models/{id}/activate` | Admin Only | Promotes a specific model to active production status |
@@ -332,7 +360,16 @@ PYTHONPATH=. pytest tests/ -v
   - `TC-18`: User feedback recording and administration view.
   - `TC-19`: High-concurrency performance SLA (10 requests under 3 seconds).
   - `TC-20`: Role-Based Access Control security enforcement.
+- **Provider Patient Portal Test Cases (`tests/test_patient_records.py` - TC-21 through TC-28):**
+  - `TC-21`: Provider lists registered patients (200), ensuring only role="patient" records appear.
+  - `TC-22`: Case-insensitive search filtering across patient username and email.
+  - `TC-23`: Filter patients by latest assessment risk level ("High" / "Low").
+  - `TC-24`: Provider opens comprehensive patient profile with latest vitals and assessment history.
+  - `TC-25`: 404 handling for non-existent patient IDs and non-patient accounts.
+  - `TC-26`: RBAC enforcement (patient receives 403 Forbidden, anonymous receives 401).
+  - `TC-27`: Page route GET `/patients` authentication and role redirection (provider 200, patient 303, anonymous 303).
+  - `TC-28`: Administrative dual-access verification on patient directory endpoints.
 - **Model Equivalence Tests (`tests/test_models_equivalence.py`):**
   - Confirms zero-divergence ($\le 10^{-5}$) between exported pure-Python modules and original scikit-learn models across test samples.
 
-**Result:** `25 passed in ~12 seconds` (100% test pass rate).
+**Result:** `33 passed in ~10 seconds` (100% test pass rate).

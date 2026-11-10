@@ -51,6 +51,14 @@ def setup_test_database():
                 role="patient"
             ))
 
+        if not db.query(User).filter(User.username == "sarah_jenkins").first():
+            db.add(User(
+                username="sarah_jenkins",
+                email="sarah.jenkins@example.com",
+                password_hash=get_password_hash("PatientPassword123!"),
+                role="patient"
+            ))
+
         # Seed baseline test models
         if not db.query(MLModel).first():
             db.add(MLModel(
